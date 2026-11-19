@@ -169,4 +169,35 @@ describe('cycle-engine', () => {
     expect(insights.topSymptoms[0]).toMatchObject({ id: 'cramps', count: 3 });
     expect(insights.topMoods[0]).toMatchObject({ id: 'tired', count: 2 });
   });
+
+  it('auto-tracks active period across defaultPeriodLength if end is not marked, and stops after', () => {
+    const logs = [makeLog('2026-11-17', 'medium')];
+
+    // Day 3 (Nov 19): user forgot to log Nov 18-19 -> still treated as Period Day 3 automatically
+    const day3 = computeCycleSummary(logs, baseSettings, '2026-11-19');
+    expect(day3.status).toBe('period');
+    expect(day3.periodDay).toBe(3);
+
+    // Day 6 (Nov 22): past 5-day defaultPeriodLength -> automatically ended, now follicular countdown
+    const day6 = computeCycleSummary(logs, baseSettings, '2026-11-22');
+    expect(day6.status).toBe('follicular');
+    expect(day6.daysUntilNextPeriod).toBe(23);
+  });
+
+  it('stops predicted period tail immediately when periodEnded is marked early', () => {
+    const logs = [
+      makeLog('2026-11-17', 'medium'),
+      makeLog('2026-11-18', 'heavy'),
+      makeLog('2026-11-19', 'light', { periodEnded: true }),
+    ];
+
+    const map = buildCalendarMap(logs, baseSettings, '2026-11-19', 6);
+    expect(map.get('2026-11-19')?.isLoggedPeriod).toBe(true);
+    expect(map.get('2026-11-20')?.isPredictedPeriod ?? false).toBe(false);
+    expect(map.get('2026-11-21')?.isPredictedPeriod ?? false).toBe(false);
+
+    // Next day (Nov 20) is already follicular countdown, not period
+    const nextDay = computeCycleSummary(logs, baseSettings, '2026-11-20');
+    expect(nextDay.status).toBe('follicular');
+  });
 });

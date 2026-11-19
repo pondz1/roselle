@@ -89,6 +89,16 @@ export interface TranslationDict {
       ovulation: string;
       loggedNote: string;
     };
+    selectedDay: {
+      periodStartButton: string;
+      periodStartActive: string;
+      periodEndButton: string;
+      periodEndActive: string;
+      openDetails: string;
+      editDetails: string;
+      autoEndHint: (days: number) => string;
+      noLogsForDay: string;
+    };
   };
   dailyLog: {
     title: string;
@@ -243,6 +253,16 @@ export const translations: Record<Locale, TranslationDict> = {
         fertile: 'เจริญพันธุ์',
         ovulation: 'ไข่ตก',
         loggedNote: 'มีบันทึก',
+      },
+      selectedDay: {
+        periodStartButton: 'ประจำเดือนเริ่มวันนี้',
+        periodStartActive: 'เริ่มประจำเดือนวันนี้แล้ว',
+        periodEndButton: 'ประจำเดือนหมดวันนี้',
+        periodEndActive: 'บันทึกว่าหมดวันนี้แล้ว',
+        openDetails: 'บันทึกอาการและอารมณ์',
+        editDetails: 'แก้ไขบันทึกของวันนี้',
+        autoEndHint: (days) => `หากไม่ได้กดหยุด ระบบจะจบรอบอัตโนมัติใน ${days} วันตามค่าตั้งค่า`,
+        noLogsForDay: 'ยังไม่ได้บันทึกอาการหรืออารมณ์ในวันนี้',
       },
     },
     dailyLog: {
@@ -431,6 +451,16 @@ export const translations: Record<Locale, TranslationDict> = {
         fertile: 'Fertile',
         ovulation: 'Ovulation',
         loggedNote: 'Logged',
+      },
+      selectedDay: {
+        periodStartButton: 'Period started',
+        periodStartActive: 'Marked as period start',
+        periodEndButton: 'Period ended',
+        periodEndActive: 'Marked as period end',
+        openDetails: 'Log symptoms & mood',
+        editDetails: 'Edit daily log',
+        autoEndHint: (days) => `Auto-ends after ${days} days based on your cycle defaults if unmarked`,
+        noLogsForDay: 'No symptoms or moods logged on this day',
       },
     },
     dailyLog: {

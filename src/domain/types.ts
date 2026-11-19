@@ -36,6 +36,7 @@ export type ActivityId = (typeof ACTIVITY_IDS)[number];
 export interface DailyLog {
   date: ISODate;
   flow: FlowLevel;
+  periodEnded?: boolean;
   symptoms: SymptomId[];
   moods: MoodId[];
   activities: ActivityId[];
@@ -71,6 +72,7 @@ export interface PeriodEpisode {
   endDate: ISODate;
   loggedDays: ISODate[];
   lengthDays: number;
+  isExplicitlyEnded: boolean;
 }
 
 export type CycleStatus =

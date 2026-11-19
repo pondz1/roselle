@@ -7,11 +7,17 @@ export interface BackupSnapshot {
   logs: DailyLog[];
 }
 
+export interface PeriodDayUpdate {
+  date: ISODate;
+  flow: FlowLevel;
+  periodEnded?: boolean;
+}
+
 export interface CycleRepository {
   getAllLogs(): Promise<DailyLog[]>;
   getLogByDate(date: ISODate): Promise<DailyLog | undefined>;
   upsertLog(input: DailyLogInput): Promise<DailyLog>;
-  bulkSetPeriodDays(updates: Array<{ date: ISODate; flow: FlowLevel }>): Promise<void>;
+  bulkSetPeriodDays(updates: PeriodDayUpdate[]): Promise<void>;
   softDeleteLog(date: ISODate): Promise<void>;
   getSettings(): Promise<UserSettings>;
   updateSettings(patch: Partial<Omit<UserSettings, 'id' | 'updatedAt'>>): Promise<UserSettings>;

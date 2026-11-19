@@ -36,10 +36,11 @@ function hasNonFlowLogs(log: DailyLog): boolean {
 }
 
 export function extractPeriodEpisodes(logs: DailyLog[]): PeriodEpisode[] {
-  const periodDates = logs
-    .filter((log) => log.deletedAt === null && log.flow !== 'none')
-    .map((log) => log.date)
-    .sort(compareDates);
+  const activePeriodLogs = logs.filter((log) => log.deletedAt === null && log.flow !== 'none');
+  const endedDates = new Set(
+    activePeriodLogs.filter((log) => log.periodEnded === true).map((log) => log.date),
+  );
+  const periodDates = activePeriodLogs.map((log) => log.date).sort(compareDates);
 
   const uniqueDates = Array.from(new Set(periodDates));
   if (uniqueDates.length === 0) return [];
@@ -50,6 +51,7 @@ export function extractPeriodEpisodes(logs: DailyLog[]): PeriodEpisode[] {
     endDate: uniqueDates[0],
     loggedDays: [uniqueDates[0]],
     lengthDays: 1,
+    isExplicitlyEnded: endedDates.has(uniqueDates[0]),
   };
 
   for (let i = 1; i < uniqueDates.length; i += 1) {
@@ -61,6 +63,9 @@ export function extractPeriodEpisodes(logs: DailyLog[]): PeriodEpisode[] {
       current.endDate = date;
       current.loggedDays.push(date);
       current.lengthDays = diffDays(current.startDate, current.endDate) + 1;
+      if (endedDates.has(date)) {
+        current.isExplicitlyEnded = true;
+      }
     } else {
       episodes.push(current);
       current = {
@@ -68,6 +73,7 @@ export function extractPeriodEpisodes(logs: DailyLog[]): PeriodEpisode[] {
         endDate: date,
         loggedDays: [date],
         lengthDays: 1,
+        isExplicitlyEnded: endedDates.has(date),
       };
     }
   }
@@ -191,6 +197,12 @@ export function computeCycleSummary(
   const isTodayLoggedPeriod = Boolean(todayLog && todayLog.flow !== 'none');
   const isInsideLatestEpisode =
     compareDates(today, latest.startDate) >= 0 && compareDates(today, latest.endDate) <= 0;
+  const isInsideAutoPeriodWindow =
+    !latest.isExplicitlyEnded &&
+    compareDates(today, latest.startDate) >= 0 &&
+    diffDays(latest.startDate, today) < predictedPeriodLength;
+  const isActivePeriodToday =
+    isTodayLoggedPeriod || isInsideLatestEpisode || isInsideAutoPeriodWindow;
 
   const currentCycleDay =
     compareDates(today, latest.startDate) >= 0 ? diffDays(latest.startDate, today) + 1 : 1;
@@ -206,14 +218,14 @@ export function computeCycleSummary(
   const conceptionChance = computeConceptionChance(
     today,
     currentProjection.ovulationDate,
-    isTodayLoggedPeriod || isInsideLatestEpisode,
+    isActivePeriodToday,
   );
 
   let status: CycleStatus;
   let periodDay: number | null = null;
   let daysLate = 0;
 
-  if (isTodayLoggedPeriod || isInsideLatestEpisode) {
+  if (isActivePeriodToday) {
     status = 'period';
     periodDay = diffDays(latest.startDate, today) + 1;
   } else if (daysUntilNextPeriod === 0) {
@@ -350,12 +362,19 @@ export function buildCalendarMap(
     settings.lutealPhaseLength,
   );
 
-  for (let d = 0; d < predictedPeriodLength; d += 1) {
-    const date = addDays(latest.startDate, d);
-    const info = ensureDay(date);
-    info.cycleDay = d + 1;
-    if (!info.isLoggedPeriod && compareDates(date, today) >= 0) {
-      info.isPredictedPeriod = true;
+  const isOngoingAutoWindow =
+    !latest.isExplicitlyEnded &&
+    compareDates(today, latest.startDate) >= 0 &&
+    diffDays(latest.startDate, today) < predictedPeriodLength;
+
+  if (!latest.isExplicitlyEnded) {
+    for (let d = 0; d < predictedPeriodLength; d += 1) {
+      const date = addDays(latest.startDate, d);
+      const info = ensureDay(date);
+      info.cycleDay = d + 1;
+      if (!info.isLoggedPeriod && (compareDates(date, today) >= 0 || isOngoingAutoWindow)) {
+        info.isPredictedPeriod = true;
+      }
     }
   }
 

@@ -2,12 +2,11 @@ import {
   DEFAULT_USER_SETTINGS,
   type DailyLog,
   type DailyLogInput,
-  type FlowLevel,
   type ISODate,
   type UserSettings,
 } from '../domain/types';
 import { RoselleDatabase } from './db';
-import type { BackupSnapshot, CycleRepository } from './repository';
+import type { BackupSnapshot, CycleRepository, PeriodDayUpdate } from './repository';
 
 function isEmptyLogInput(input: DailyLogInput): boolean {
   return (
@@ -61,18 +60,25 @@ export class DexieCycleRepository implements CycleRepository {
     return record;
   }
 
-  async bulkSetPeriodDays(updates: Array<{ date: ISODate; flow: FlowLevel }>): Promise<void> {
+  async bulkSetPeriodDays(updates: PeriodDayUpdate[]): Promise<void> {
     if (updates.length === 0) return;
     const now = new Date().toISOString();
 
     await this.db.transaction('rw', this.db.logs, async () => {
-      for (const { date, flow } of updates) {
+      for (const { date, flow, periodEnded } of updates) {
         const existing = await this.db.logs.get(date);
+        const resolvedEnded =
+          flow === 'none'
+            ? false
+            : periodEnded !== undefined
+              ? periodEnded
+              : (existing?.periodEnded ?? false);
         const base: DailyLogInput =
           existing && existing.deletedAt === null
             ? {
                 date,
                 flow,
+                periodEnded: resolvedEnded,
                 symptoms: existing.symptoms,
                 moods: existing.moods,
                 activities: existing.activities,
@@ -81,6 +87,7 @@ export class DexieCycleRepository implements CycleRepository {
             : {
                 date,
                 flow,
+                periodEnded: resolvedEnded,
                 symptoms: [],
                 moods: [],
                 activities: [],
@@ -92,6 +99,7 @@ export class DexieCycleRepository implements CycleRepository {
             await this.db.logs.put({
               ...existing,
               flow: 'none',
+              periodEnded: false,
               updatedAt: now,
               deletedAt: now,
               syncStatus: 'pending',

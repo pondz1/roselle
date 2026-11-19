@@ -8,13 +8,14 @@ import {
   type ReactNode,
 } from 'react';
 import { DexieCycleRepository } from '../data/dexie-repository';
-import type { BackupSnapshot, CycleRepository } from '../data/repository';
+import type { BackupSnapshot, CycleRepository, PeriodDayUpdate } from '../data/repository';
 import {
   buildCalendarMap,
   computeCycleSummary,
   computeInsights,
+  extractPeriodEpisodes,
 } from '../domain/cycle-engine';
-import { addDays, compareDates, todayISO } from '../domain/date-utils';
+import { addDays, compareDates, diffDays, todayISO } from '../domain/date-utils';
 import {
   DEFAULT_USER_SETTINGS,
   type CycleInsights,
@@ -24,6 +25,7 @@ import {
   type DayCalendarInfo,
   type FlowLevel,
   type ISODate,
+  type PeriodEpisode,
   type UserSettings,
 } from '../domain/types';
 
@@ -38,6 +40,7 @@ interface CycleContextValue {
   storageError: boolean;
   logs: DailyLog[];
   logsByDate: Map<ISODate, DailyLog>;
+  episodes: PeriodEpisode[];
   settings: UserSettings;
   today: ISODate;
   summary: CycleSummary;
@@ -46,7 +49,10 @@ interface CycleContextValue {
   saveLog: (input: DailyLogInput) => Promise<void>;
   toggleTodayPeriod: () => Promise<void>;
   clearTodayPeriod: () => Promise<void>;
-  bulkSetPeriodDays: (updates: Array<{ date: ISODate; flow: FlowLevel }>) => Promise<void>;
+  markPeriodStart: (date: ISODate) => Promise<void>;
+  markPeriodEnd: (date: ISODate) => Promise<void>;
+  clearPeriodDay: (date: ISODate) => Promise<void>;
+  bulkSetPeriodDays: (updates: PeriodDayUpdate[]) => Promise<void>;
   updateSettings: (patch: Partial<Omit<UserSettings, 'id' | 'updatedAt'>>) => Promise<void>;
   completeOnboarding: (payload: OnboardingPayload) => Promise<void>;
   exportBackup: () => Promise<BackupSnapshot>;
@@ -117,6 +123,8 @@ export function CycleProvider({ repository, todayOverride, children }: CycleProv
     return map;
   }, [logs]);
 
+  const episodes = useMemo(() => extractPeriodEpisodes(logs), [logs]);
+
   const summary = useMemo(
     () => computeCycleSummary(logs, settings, today),
     [logs, settings, today],
@@ -168,8 +176,76 @@ export function CycleProvider({ repository, todayOverride, children }: CycleProv
   }, [logsByDate, repo, today]);
 
   const bulkSetPeriodDays = useCallback(
-    async (updates: Array<{ date: ISODate; flow: FlowLevel }>) => {
+    async (updates: PeriodDayUpdate[]) => {
       await repo.bulkSetPeriodDays(updates);
+      const nextLogs = await repo.getAllLogs();
+      setLogs(nextLogs);
+    },
+    [repo],
+  );
+
+  const markPeriodStart = useCallback(
+    async (date: ISODate) => {
+      if (compareDates(date, today) > 0) return;
+      const updates: PeriodDayUpdate[] = [];
+      for (let i = 0; i < settings.defaultPeriodLength; i += 1) {
+        const d = addDays(date, i);
+        if (compareDates(d, today) <= 0) {
+          const existing = logsByDate.get(d);
+          const flow: FlowLevel =
+            existing && existing.flow !== 'none' ? existing.flow : 'medium';
+          updates.push({ date: d, flow, periodEnded: false });
+        }
+      }
+      await repo.bulkSetPeriodDays(updates);
+      const nextLogs = await repo.getAllLogs();
+      setLogs(nextLogs);
+    },
+    [logsByDate, repo, settings.defaultPeriodLength, today],
+  );
+
+  const markPeriodEnd = useCallback(
+    async (date: ISODate) => {
+      if (compareDates(date, today) > 0) return;
+      const matching = [...episodes]
+        .reverse()
+        .find((ep) => {
+          const offset = diffDays(ep.startDate, date);
+          return offset >= 0 && offset <= 12;
+        });
+
+      const updates: PeriodDayUpdate[] = [];
+      if (matching) {
+        const span = diffDays(matching.startDate, date);
+        for (let i = 0; i <= span; i += 1) {
+          const d = addDays(matching.startDate, i);
+          const existing = logsByDate.get(d);
+          const flow: FlowLevel =
+            existing && existing.flow !== 'none' ? existing.flow : 'medium';
+          updates.push({ date: d, flow, periodEnded: d === date });
+        }
+        const trailingDays = diffDays(date, matching.endDate);
+        for (let i = 1; i <= trailingDays; i += 1) {
+          const d = addDays(date, i);
+          updates.push({ date: d, flow: 'none', periodEnded: false });
+        }
+      } else {
+        const existing = logsByDate.get(date);
+        const flow: FlowLevel =
+          existing && existing.flow !== 'none' ? existing.flow : 'medium';
+        updates.push({ date, flow, periodEnded: true });
+      }
+
+      await repo.bulkSetPeriodDays(updates);
+      const nextLogs = await repo.getAllLogs();
+      setLogs(nextLogs);
+    },
+    [episodes, logsByDate, repo, today],
+  );
+
+  const clearPeriodDay = useCallback(
+    async (date: ISODate) => {
+      await repo.bulkSetPeriodDays([{ date, flow: 'none', periodEnded: false }]);
       const nextLogs = await repo.getAllLogs();
       setLogs(nextLogs);
     },
@@ -229,6 +305,7 @@ export function CycleProvider({ repository, todayOverride, children }: CycleProv
       storageError,
       logs,
       logsByDate,
+      episodes,
       settings,
       today,
       summary,
@@ -237,6 +314,9 @@ export function CycleProvider({ repository, todayOverride, children }: CycleProv
       saveLog,
       toggleTodayPeriod,
       clearTodayPeriod,
+      markPeriodStart,
+      markPeriodEnd,
+      clearPeriodDay,
       bulkSetPeriodDays,
       updateSettings,
       completeOnboarding,
@@ -249,6 +329,7 @@ export function CycleProvider({ repository, todayOverride, children }: CycleProv
       storageError,
       logs,
       logsByDate,
+      episodes,
       settings,
       today,
       summary,
@@ -257,6 +338,9 @@ export function CycleProvider({ repository, todayOverride, children }: CycleProv
       saveLog,
       toggleTodayPeriod,
       clearTodayPeriod,
+      markPeriodStart,
+      markPeriodEnd,
+      clearPeriodDay,
       bulkSetPeriodDays,
       updateSettings,
       completeOnboarding,

@@ -7,6 +7,7 @@ interface MonthGridProps {
   year: number;
   month: number;
   today: ISODate;
+  selectedDate: ISODate;
   calendarMap: Map<ISODate, DayCalendarInfo>;
   editMode: boolean;
   stagedPeriodDates: Set<ISODate>;
@@ -17,6 +18,7 @@ export function MonthGrid({
   year,
   month,
   today,
+  selectedDate,
   calendarMap,
   editMode,
   stagedPeriodDates,
@@ -43,6 +45,7 @@ export function MonthGrid({
           const info = calendarMap.get(date);
           const { day } = parseISODate(date);
           const isToday = date === today;
+          const isSelected = !editMode && date === selectedDate;
           const isFuture = compareDates(date, today) > 0;
 
           let phase: string = 'none';
@@ -82,9 +85,11 @@ export function MonthGrid({
               disabled={disabled}
               onClick={() => onTapDate(date)}
               aria-label={date}
+              aria-pressed={isSelected}
               className={[
                 'relative flex flex-col items-center justify-center min-h-11 py-1 rounded-[12px]',
-                'transition-[transform,opacity] duration-[150ms] active:scale-[0.95]',
+                'transition-[transform,opacity,background-color] duration-[150ms] active:scale-[0.95]',
+                isSelected ? 'bg-tinted-subtle' : '',
                 !inCurrentMonth ? 'opacity-35' : '',
                 disabled ? 'opacity-30 pointer-events-none' : '',
               ]

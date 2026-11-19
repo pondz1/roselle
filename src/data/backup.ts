@@ -94,9 +94,12 @@ function validateLog(raw: unknown): DailyLog | null {
   const deletedAt =
     raw.deletedAt === null || typeof raw.deletedAt === 'string' ? raw.deletedAt : null;
 
+  const periodEnded = typeof raw.periodEnded === 'boolean' ? raw.periodEnded : false;
+
   return {
     date: raw.date,
     flow: raw.flow as FlowLevel,
+    periodEnded,
     symptoms: Array.from(new Set(raw.symptoms as SymptomId[])),
     moods: Array.from(new Set(raw.moods as MoodId[])),
     activities: Array.from(new Set(raw.activities as ActivityId[])),

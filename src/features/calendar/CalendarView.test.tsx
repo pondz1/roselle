@@ -22,7 +22,7 @@ function Harness({ onSelectDate }: { onSelectDate: (date: string) => void }) {
 }
 
 describe('CalendarView', () => {
-  it('renders phase markers and opens selected date on tap', async () => {
+  it('renders phase markers, selects tapped date in panel, and opens details sheet', async () => {
     const db = new RoselleDatabase(`CalTest_${Math.random().toString(36).slice(2)}`);
     const repo = new DexieCycleRepository(db);
     await repo.updateSettings({ onboardingCompleted: true, locale: 'en' });
@@ -49,7 +49,52 @@ describe('CalendarView', () => {
     );
 
     await user.click(day1);
+    expect(day1).toHaveAttribute('aria-pressed', 'true');
+    await user.click(screen.getByRole('button', { name: 'Edit daily log' }));
     expect(onSelectDate).toHaveBeenCalledWith('2026-11-01');
+    await db.delete();
+  });
+
+  it('marks period start (auto-filling defaultPeriodLength) and trims cleanly on period end', async () => {
+    const db = new RoselleDatabase(`CalStartEnd_${Math.random().toString(36).slice(2)}`);
+    const repo = new DexieCycleRepository(db);
+    await repo.updateSettings({
+      onboardingCompleted: true,
+      locale: 'en',
+      defaultPeriodLength: 5,
+    });
+    const user = userEvent.setup();
+
+    render(
+      <CycleProvider repository={repo} todayOverride="2026-11-19">
+        <Harness onSelectDate={() => {}} />
+      </CycleProvider>,
+    );
+
+    // Select Nov 10 and tap "Period started" -> auto-fills Nov 10..14 (5 days)
+    await user.click(await screen.findByTestId('cal-day-2026-11-10'));
+    await user.click(screen.getByRole('button', { name: 'Period started' }));
+
+    await waitFor(async () => {
+      const logs = await repo.getAllLogs();
+      expect(logs.map((l) => l.date)).toEqual([
+        '2026-11-10',
+        '2026-11-11',
+        '2026-11-12',
+        '2026-11-13',
+        '2026-11-14',
+      ]);
+    });
+
+    // Select Nov 12 and tap "Period ended" -> trims Nov 13..14 and marks Nov 12 periodEnded=true
+    await user.click(screen.getByTestId('cal-day-2026-11-12'));
+    await user.click(screen.getByRole('button', { name: 'Period ended' }));
+
+    await waitFor(async () => {
+      const logs = await repo.getAllLogs();
+      expect(logs.map((l) => l.date)).toEqual(['2026-11-10', '2026-11-11', '2026-11-12']);
+      expect(logs[2].periodEnded).toBe(true);
+    });
     await db.delete();
   });
 
@@ -69,7 +114,6 @@ describe('CalendarView', () => {
     await user.click(screen.getByTestId('cal-day-2026-11-10'));
     await user.click(screen.getByTestId('cal-day-2026-11-11'));
     await user.click(screen.getByTestId('cal-day-2026-11-12'));
-    // Future date button should be disabled in edit mode
     expect(screen.getByTestId('cal-day-2026-11-25')).toBeDisabled();
 
     await user.click(screen.getByRole('button', { name: 'Save' }));

@@ -8,6 +8,7 @@ import { useCycle } from '../../state/CycleProvider';
 import { CalendarLegend } from './CalendarLegend';
 import { MonthGrid } from './MonthGrid';
 import { PeriodEditBanner } from './PeriodEditBanner';
+import { SelectedDayPanel } from './SelectedDayPanel';
 
 interface CalendarViewProps {
   onSelectDate: (date: ISODate) => void;
@@ -22,6 +23,7 @@ export function CalendarView({ onSelectDate }: CalendarViewProps) {
     year: initial.year,
     month: initial.month,
   });
+  const [selectedDate, setSelectedDate] = useState<ISODate>(today);
   const [editMode, setEditMode] = useState(false);
   const [stagedDates, setStagedDates] = useState<Set<ISODate>>(new Set());
   const [saving, setSaving] = useState(false);
@@ -41,7 +43,7 @@ export function CalendarView({ onSelectDate }: CalendarViewProps) {
 
   const handleTapDate = (date: ISODate) => {
     if (!editMode) {
-      onSelectDate(date);
+      setSelectedDate(date);
       return;
     }
     if (compareDates(date, today) > 0) return;
@@ -115,7 +117,10 @@ export function CalendarView({ onSelectDate }: CalendarViewProps) {
           {!isCurrentMonth ? (
             <button
               type="button"
-              onClick={() => setCursor({ year: initial.year, month: initial.month })}
+              onClick={() => {
+                setCursor({ year: initial.year, month: initial.month });
+                setSelectedDate(today);
+              }}
               className="mr-1 px-3 py-1.5 rounded-full text-[0.75rem] font-medium bg-tinted-subtle text-ink-primary hover:bg-coral-rose-soft hover:text-coral-rose-ink transition-colors"
             >
               {t.calendar.jumpToday}
@@ -144,6 +149,7 @@ export function CalendarView({ onSelectDate }: CalendarViewProps) {
         year={cursor.year}
         month={cursor.month}
         today={today}
+        selectedDate={selectedDate}
         calendarMap={calendarMap}
         editMode={editMode}
         stagedPeriodDates={stagedDates}
@@ -151,6 +157,10 @@ export function CalendarView({ onSelectDate }: CalendarViewProps) {
       />
 
       <CalendarLegend />
+
+      {!editMode ? (
+        <SelectedDayPanel date={selectedDate} onOpenDetails={onSelectDate} />
+      ) : null}
     </div>
   );
 }

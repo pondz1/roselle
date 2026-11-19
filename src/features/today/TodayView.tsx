@@ -1,0 +1,119 @@
+import { Droplets, PenLine } from 'lucide-react';
+import { Button } from '../../components/ui/Button';
+import { EmptyState } from '../../components/ui/EmptyState';
+import { formatFullDate, formatShortDate } from '../../domain/date-utils';
+import type { ISODate } from '../../domain/types';
+import { useI18n } from '../../i18n/I18nProvider';
+import { useCycle } from '../../state/CycleProvider';
+import { CycleRing } from './CycleRing';
+import { TodayLogSummary } from './TodayLogSummary';
+
+interface TodayViewProps {
+  onOpenLog: (date: ISODate) => void;
+}
+
+export function TodayView({ onOpenLog }: TodayViewProps) {
+  const { today, summary, logsByDate, toggleTodayPeriod, clearTodayPeriod } = useCycle();
+  const { locale, setLocale, t } = useI18n();
+
+  const todayLog = logsByDate.get(today);
+  const isTodayLoggedPeriod = Boolean(todayLog && todayLog.flow !== 'none');
+
+  return (
+    <div className="flex flex-col pb-6">
+      <header className="flex items-center justify-between px-5 pt-6 pb-4">
+        <div>
+          <p className="text-[0.8125rem] font-medium text-ink-secondary tabular-nums">
+            {formatFullDate(today, locale)}
+          </p>
+          <h1 className="text-[1.375rem] font-semibold tracking-tight text-ink-primary">
+            {t.appName}
+          </h1>
+        </div>
+
+        <div
+          className="inline-flex rounded-full bg-tinted-subtle p-1"
+          role="group"
+          aria-label={t.settings.languageTitle}
+        >
+          {(['th', 'en'] as const).map((lang) => (
+            <button
+              key={lang}
+              type="button"
+              onClick={() => setLocale(lang)}
+              className={[
+                'px-2.5 py-1 rounded-full text-[0.75rem] font-medium transition-colors duration-[160ms]',
+                locale === lang
+                  ? 'bg-warm-surface text-coral-rose-ink'
+                  : 'text-ink-muted hover:text-ink-primary',
+              ].join(' ')}
+            >
+              {lang.toUpperCase()}
+            </button>
+          ))}
+        </div>
+      </header>
+
+      {summary.status === 'no_data' ? (
+        <div className="py-6">
+          <EmptyState
+            icon={<Droplets className="w-6 h-6" />}
+            title={t.today.emptyTitle}
+            body={t.today.emptyBody}
+            action={
+              <Button size="lg" onClick={() => void toggleTodayPeriod()}>
+                <Droplets className="w-4 h-4" />
+                <span>{t.today.logPeriodToday}</span>
+              </Button>
+            }
+          />
+        </div>
+      ) : (
+        <section className="px-5 pt-2 pb-6 flex flex-col items-center">
+          <CycleRing summary={summary} />
+
+          <div className="mt-6 w-full flex flex-col gap-2">
+            {isTodayLoggedPeriod ? (
+              <>
+                <Button fullWidth size="lg" onClick={() => onOpenLog(today)}>
+                  <PenLine className="w-4 h-4" />
+                  <span>{t.today.editTodayLog}</span>
+                </Button>
+                <Button
+                  fullWidth
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => void clearTodayPeriod()}
+                >
+                  {t.today.clearPeriodToday}
+                </Button>
+              </>
+            ) : (
+              <Button fullWidth size="lg" onClick={() => void toggleTodayPeriod()}>
+                <Droplets className="w-4 h-4" />
+                <span>{t.today.logPeriodToday}</span>
+              </Button>
+            )}
+          </div>
+
+          <div className="mt-6 w-full grid grid-cols-2 divide-x divide-rose-hairline border-y border-rose-hairline py-3.5">
+            <div className="pr-3">
+              <p className="text-[0.75rem] text-ink-muted">{t.today.nextPeriodLabel}</p>
+              <p className="mt-0.5 text-[0.9375rem] font-semibold text-ink-primary tabular-nums">
+                {summary.nextPeriodStart ? formatShortDate(summary.nextPeriodStart, locale) : '-'}
+              </p>
+            </div>
+            <div className="pl-4">
+              <p className="text-[0.75rem] text-ink-muted">{t.today.ovulationDateLabel}</p>
+              <p className="mt-0.5 text-[0.9375rem] font-semibold text-fertile-sage-ink tabular-nums">
+                {summary.ovulationDate ? formatShortDate(summary.ovulationDate, locale) : '-'}
+              </p>
+            </div>
+          </div>
+        </section>
+      )}
+
+      <TodayLogSummary log={todayLog} onEdit={() => onOpenLog(today)} />
+    </div>
+  );
+}

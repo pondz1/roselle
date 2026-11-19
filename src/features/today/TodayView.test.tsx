@@ -1,0 +1,72 @@
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { PinkBirdDatabase } from '../../data/db';
+import { DexieCycleRepository } from '../../data/dexie-repository';
+import { I18nProvider } from '../../i18n/I18nProvider';
+import { CycleProvider, useCycle } from '../../state/CycleProvider';
+import { TodayView } from './TodayView';
+
+function Harness({ onOpenLog }: { onOpenLog: (date: string) => void }) {
+  const { settings, updateSettings, loading } = useCycle();
+  if (loading) return <div>loading</div>;
+  return (
+    <I18nProvider
+      locale={settings.locale}
+      onChangeLocale={(locale) => {
+        void updateSettings({ locale });
+      }}
+    >
+      <TodayView onOpenLog={onOpenLog} />
+    </I18nProvider>
+  );
+}
+
+describe('TodayView', () => {
+  it('shows honest empty state and logs period in one tap', async () => {
+    const db = new PinkBirdDatabase(`TodayEmpty_${Math.random().toString(36).slice(2)}`);
+    const repo = new DexieCycleRepository(db);
+    await repo.updateSettings({ onboardingCompleted: true });
+    const user = userEvent.setup();
+    const onOpenLog = vi.fn();
+
+    render(
+      <CycleProvider repository={repo} todayOverride="2026-11-19">
+        <Harness onOpenLog={onOpenLog} />
+      </CycleProvider>,
+    );
+
+    expect(await screen.findByText('ยังไม่มีข้อมูลรอบเดือน')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'บันทึกประจำเดือนวันนี้' }));
+
+    await waitFor(() => expect(screen.getByText('ประจำเดือนวันที่ 1')).toBeInTheDocument());
+    expect(screen.getByRole('button', { name: 'แก้ไขบันทึกวันนี้' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'ยกเลิกวันประจำเดือนวันนี้' })).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'แก้ไขบันทึกวันนี้' }));
+    expect(onOpenLog).toHaveBeenCalledWith('2026-11-19');
+    await db.delete();
+  });
+
+  it('shows late period status clearly when overdue', async () => {
+    const db = new PinkBirdDatabase(`TodayLate_${Math.random().toString(36).slice(2)}`);
+    const repo = new DexieCycleRepository(db);
+    await repo.updateSettings({ onboardingCompleted: true, defaultCycleLength: 28 });
+    await repo.upsertLog({
+      date: '2026-10-15',
+      flow: 'medium',
+      symptoms: [],
+      moods: [],
+      activities: [],
+      note: '',
+    });
+
+    render(
+      <CycleProvider repository={repo} todayOverride="2026-11-16">
+        <Harness onOpenLog={() => {}} />
+      </CycleProvider>,
+    );
+
+    expect(await screen.findByText('เลยกำหนด 4 วัน')).toBeInTheDocument();
+    await db.delete();
+  });
+});

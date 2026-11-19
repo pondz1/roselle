@@ -38,18 +38,20 @@ export function DailyLogSheet({ date, open, onClose }: DailyLogSheetProps) {
   const [note, setNote] = useState('');
   const [saving, setSaving] = useState(false);
 
-  const existingLog = date ? logsByDate.get(date) : undefined;
   const dayInfo = date ? calendarMap.get(date) : undefined;
   const isFuture = date ? compareDates(date, today) > 0 : false;
 
   useEffect(() => {
     if (!open || !date) return;
-    setFlow(existingLog?.flow ?? 'none');
-    setSymptoms(existingLog?.symptoms ?? []);
-    setMoods(existingLog?.moods ?? []);
-    setActivities(existingLog?.activities ?? []);
-    setNote(existingLog?.note ?? '');
-  }, [open, date, existingLog]);
+    const current = logsByDate.get(date);
+    setFlow(current?.flow ?? 'none');
+    setSymptoms(current?.symptoms ?? []);
+    setMoods(current?.moods ?? []);
+    setActivities(current?.activities ?? []);
+    setNote(current?.note ?? '');
+    // Hydrate form only when opening the sheet or switching target date
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, date]);
 
   if (!date) return null;
 

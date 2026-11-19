@@ -1,0 +1,276 @@
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from 'react';
+import { DexieCycleRepository } from '../data/dexie-repository';
+import type { BackupSnapshot, CycleRepository } from '../data/repository';
+import {
+  buildCalendarMap,
+  computeCycleSummary,
+  computeInsights,
+} from '../domain/cycle-engine';
+import { addDays, compareDates, todayISO } from '../domain/date-utils';
+import {
+  DEFAULT_USER_SETTINGS,
+  type CycleInsights,
+  type CycleSummary,
+  type DailyLog,
+  type DailyLogInput,
+  type DayCalendarInfo,
+  type FlowLevel,
+  type ISODate,
+  type UserSettings,
+} from '../domain/types';
+
+export interface OnboardingPayload {
+  lastPeriodStart: ISODate | null;
+  defaultPeriodLength: number;
+  defaultCycleLength: number;
+}
+
+interface CycleContextValue {
+  loading: boolean;
+  storageError: boolean;
+  logs: DailyLog[];
+  logsByDate: Map<ISODate, DailyLog>;
+  settings: UserSettings;
+  today: ISODate;
+  summary: CycleSummary;
+  calendarMap: Map<ISODate, DayCalendarInfo>;
+  insights: CycleInsights;
+  saveLog: (input: DailyLogInput) => Promise<void>;
+  toggleTodayPeriod: () => Promise<void>;
+  clearTodayPeriod: () => Promise<void>;
+  bulkSetPeriodDays: (updates: Array<{ date: ISODate; flow: FlowLevel }>) => Promise<void>;
+  updateSettings: (patch: Partial<Omit<UserSettings, 'id' | 'updatedAt'>>) => Promise<void>;
+  completeOnboarding: (payload: OnboardingPayload) => Promise<void>;
+  exportBackup: () => Promise<BackupSnapshot>;
+  importBackup: (snapshot: BackupSnapshot) => Promise<void>;
+  resetAllData: () => Promise<void>;
+}
+
+const CycleContext = createContext<CycleContextValue | null>(null);
+
+let defaultRepoSingleton: CycleRepository | null = null;
+function getDefaultRepository(): CycleRepository {
+  if (!defaultRepoSingleton) {
+    defaultRepoSingleton = new DexieCycleRepository();
+  }
+  return defaultRepoSingleton;
+}
+
+interface CycleProviderProps {
+  repository?: CycleRepository;
+  todayOverride?: ISODate;
+  children: ReactNode;
+}
+
+export function CycleProvider({ repository, todayOverride, children }: CycleProviderProps) {
+  const repo = useMemo(() => repository ?? getDefaultRepository(), [repository]);
+  const today = todayOverride ?? todayISO();
+
+  const [loading, setLoading] = useState(true);
+  const [storageError, setStorageError] = useState(false);
+  const [logs, setLogs] = useState<DailyLog[]>([]);
+  const [settings, setSettings] = useState<UserSettings>({
+    ...DEFAULT_USER_SETTINGS,
+    updatedAt: '',
+  });
+
+  const refreshAll = useCallback(async () => {
+    const [loadedLogs, loadedSettings] = await Promise.all([
+      repo.getAllLogs(),
+      repo.getSettings(),
+    ]);
+    setLogs(loadedLogs);
+    setSettings(loadedSettings);
+  }, [repo]);
+
+  useEffect(() => {
+    let active = true;
+    setLoading(true);
+    setStorageError(false);
+
+    refreshAll()
+      .catch(() => {
+        if (active) setStorageError(true);
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [refreshAll]);
+
+  const logsByDate = useMemo(() => {
+    const map = new Map<ISODate, DailyLog>();
+    for (const log of logs) {
+      map.set(log.date, log);
+    }
+    return map;
+  }, [logs]);
+
+  const summary = useMemo(
+    () => computeCycleSummary(logs, settings, today),
+    [logs, settings, today],
+  );
+
+  const calendarMap = useMemo(
+    () => buildCalendarMap(logs, settings, today, 6),
+    [logs, settings, today],
+  );
+
+  const insights = useMemo(() => computeInsights(logs, today), [logs, today]);
+
+  const saveLog = useCallback(
+    async (input: DailyLogInput) => {
+      await repo.upsertLog(input);
+      const nextLogs = await repo.getAllLogs();
+      setLogs(nextLogs);
+    },
+    [repo],
+  );
+
+  const toggleTodayPeriod = useCallback(async () => {
+    const existing = logsByDate.get(today);
+    await repo.upsertLog({
+      date: today,
+      flow: existing && existing.flow !== 'none' ? existing.flow : 'medium',
+      symptoms: existing?.symptoms ?? [],
+      moods: existing?.moods ?? [],
+      activities: existing?.activities ?? [],
+      note: existing?.note ?? '',
+    });
+    const nextLogs = await repo.getAllLogs();
+    setLogs(nextLogs);
+  }, [logsByDate, repo, today]);
+
+  const clearTodayPeriod = useCallback(async () => {
+    const existing = logsByDate.get(today);
+    if (!existing) return;
+    await repo.upsertLog({
+      date: today,
+      flow: 'none',
+      symptoms: existing.symptoms,
+      moods: existing.moods,
+      activities: existing.activities,
+      note: existing.note,
+    });
+    const nextLogs = await repo.getAllLogs();
+    setLogs(nextLogs);
+  }, [logsByDate, repo, today]);
+
+  const bulkSetPeriodDays = useCallback(
+    async (updates: Array<{ date: ISODate; flow: FlowLevel }>) => {
+      await repo.bulkSetPeriodDays(updates);
+      const nextLogs = await repo.getAllLogs();
+      setLogs(nextLogs);
+    },
+    [repo],
+  );
+
+  const updateSettings = useCallback(
+    async (patch: Partial<Omit<UserSettings, 'id' | 'updatedAt'>>) => {
+      const updated = await repo.updateSettings(patch);
+      setSettings(updated);
+    },
+    [repo],
+  );
+
+  const completeOnboarding = useCallback(
+    async (payload: OnboardingPayload) => {
+      if (payload.lastPeriodStart && compareDates(payload.lastPeriodStart, today) <= 0) {
+        const updates: Array<{ date: ISODate; flow: FlowLevel }> = [];
+        for (let i = 0; i < payload.defaultPeriodLength; i += 1) {
+          const d = addDays(payload.lastPeriodStart, i);
+          if (compareDates(d, today) <= 0) {
+            updates.push({ date: d, flow: 'medium' });
+          }
+        }
+        await repo.bulkSetPeriodDays(updates);
+      }
+
+      await repo.updateSettings({
+        defaultCycleLength: payload.defaultCycleLength,
+        defaultPeriodLength: payload.defaultPeriodLength,
+        onboardingCompleted: true,
+      });
+
+      await refreshAll();
+    },
+    [refreshAll, repo, today],
+  );
+
+  const exportBackup = useCallback(() => repo.exportSnapshot(), [repo]);
+
+  const importBackup = useCallback(
+    async (snapshot: BackupSnapshot) => {
+      await repo.importSnapshot(snapshot);
+      await refreshAll();
+    },
+    [refreshAll, repo],
+  );
+
+  const resetAllData = useCallback(async () => {
+    await repo.clearAll();
+    await refreshAll();
+  }, [refreshAll, repo]);
+
+  const value = useMemo<CycleContextValue>(
+    () => ({
+      loading,
+      storageError,
+      logs,
+      logsByDate,
+      settings,
+      today,
+      summary,
+      calendarMap,
+      insights,
+      saveLog,
+      toggleTodayPeriod,
+      clearTodayPeriod,
+      bulkSetPeriodDays,
+      updateSettings,
+      completeOnboarding,
+      exportBackup,
+      importBackup,
+      resetAllData,
+    }),
+    [
+      loading,
+      storageError,
+      logs,
+      logsByDate,
+      settings,
+      today,
+      summary,
+      calendarMap,
+      insights,
+      saveLog,
+      toggleTodayPeriod,
+      clearTodayPeriod,
+      bulkSetPeriodDays,
+      updateSettings,
+      completeOnboarding,
+      exportBackup,
+      importBackup,
+      resetAllData,
+    ],
+  );
+
+  return <CycleContext.Provider value={value}>{children}</CycleContext.Provider>;
+}
+
+export function useCycle(): CycleContextValue {
+  const ctx = useContext(CycleContext);
+  if (!ctx) throw new Error('useCycle must be used within CycleProvider');
+  return ctx;
+}

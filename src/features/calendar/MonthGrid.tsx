@@ -114,7 +114,7 @@ export function MonthGrid({
                 ) : null}
               </span>
 
-              <span className="h-1.5 mt-0.5 flex items-center justify-center gap-0.5">
+              <span className="h-1.5 mt-1 flex items-center justify-center gap-0.5">
                 {!editMode && info?.isOvulation ? (
                   <span aria-hidden="true" className="w-1.5 h-1.5 rounded-full bg-fertile-sage" />
                 ) : null}

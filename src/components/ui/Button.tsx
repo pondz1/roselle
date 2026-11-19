@@ -40,7 +40,7 @@ export function Button({
     <button
       type={type}
       className={[
-        'inline-flex items-center justify-center gap-2 rounded-full font-medium',
+        'inline-flex items-center justify-center gap-2 rounded-full font-medium shrink-0 whitespace-nowrap',
         'transition-[background-color,color,transform,opacity] duration-[180ms] ease-[cubic-bezier(0.16,1,0.3,1)]',
         'disabled:opacity-45 disabled:pointer-events-none select-none',
         VARIANT_CLASSES[variant],

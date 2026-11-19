@@ -118,13 +118,13 @@ export function CycleRing({ summary }: CycleRingProps) {
           />
         </svg>
 
-        <div className="absolute inset-6 flex flex-col items-center justify-center text-center px-3">
+        <div className="absolute inset-5 flex flex-col items-center justify-center text-center px-2">
           {eyebrow ? (
             <span className="text-[0.75rem] font-medium text-ink-secondary tabular-nums">
               {eyebrow}
             </span>
           ) : null}
-          <div className="mt-1 text-[1.5rem] font-bold leading-tight text-ink-primary tabular-nums">
+          <div className="mt-1 text-[1.1875rem] font-bold leading-snug text-ink-primary tabular-nums text-balance">
             {headline}
           </div>
           {subtext ? (

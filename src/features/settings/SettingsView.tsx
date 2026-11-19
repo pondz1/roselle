@@ -59,7 +59,7 @@ export function SettingsView() {
         <h2 className="text-[0.8125rem] font-semibold uppercase tracking-wide text-ink-secondary mb-1">
           {t.settings.cycleDefaultsTitle}
         </h2>
-        <div className="divide-y divide-rose-hairline border-y border-rose-hairline">
+        <div className="divide-y divide-rose-hairline border-t border-rose-hairline">
           <StepperRow
             label={t.settings.defaultCycleLength}
             value={settings.defaultCycleLength}

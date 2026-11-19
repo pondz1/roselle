@@ -38,7 +38,7 @@ export function InsightsView() {
             <p className="text-[0.75rem] text-ink-muted">{t.insights.variation}</p>
             <p className="mt-1 text-[1.125rem] font-bold text-ink-primary tabular-nums">
               {insights.cycleVariation !== null
-                ? `+/-${insights.cycleVariation}${t.common.dayShort}`
+                ? `±${insights.cycleVariation} ${t.common.dayShort}`
                 : t.insights.noValue}
             </p>
           </div>

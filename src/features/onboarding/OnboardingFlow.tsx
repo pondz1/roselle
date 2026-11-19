@@ -113,6 +113,7 @@ export function OnboardingFlow() {
                   max={today}
                   value={lastPeriodStart}
                   onChange={(e) => setLastPeriodStart(e.target.value)}
+                  onInput={(e) => setLastPeriodStart(e.currentTarget.value)}
                   className="w-full min-h-12 rounded-[14px] bg-tinted-subtle border border-rose-hairline px-4 py-3 text-[0.9375rem] text-ink-primary tabular-nums focus:bg-warm-surface"
                 />
                 <p className="mt-2 text-[0.8125rem] text-ink-muted">

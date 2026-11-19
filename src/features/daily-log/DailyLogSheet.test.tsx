@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { PinkBirdDatabase } from '../../data/db';
+import { RoselleDatabase } from '../../data/db';
 import { DexieCycleRepository } from '../../data/dexie-repository';
 import { I18nProvider } from '../../i18n/I18nProvider';
 import { CycleProvider, useCycle } from '../../state/CycleProvider';
@@ -23,7 +23,7 @@ function Harness({ date, onClose }: { date: string; onClose: () => void }) {
 
 describe('DailyLogSheet', () => {
   it('saves selected flow, symptoms, moods, activities, and note', async () => {
-    const db = new PinkBirdDatabase(`SheetTest_${Math.random().toString(36).slice(2)}`);
+    const db = new RoselleDatabase(`SheetTest_${Math.random().toString(36).slice(2)}`);
     const repo = new DexieCycleRepository(db);
     const user = userEvent.setup();
     const onClose = vi.fn();
@@ -54,7 +54,7 @@ describe('DailyLogSheet', () => {
   });
 
   it('shows read-only future notice and disables save for dates after today', async () => {
-    const db = new PinkBirdDatabase(`SheetFuture_${Math.random().toString(36).slice(2)}`);
+    const db = new RoselleDatabase(`SheetFuture_${Math.random().toString(36).slice(2)}`);
     const repo = new DexieCycleRepository(db);
 
     render(

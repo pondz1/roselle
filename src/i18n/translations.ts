@@ -159,7 +159,7 @@ export interface TranslationDict {
 
 export const translations: Record<Locale, TranslationDict> = {
   th: {
-    appName: 'PinkBird',
+    appName: 'Roselle',
     common: {
       days: (n) => `${n} วัน`,
       dayShort: 'วัน',
@@ -347,7 +347,7 @@ export const translations: Record<Locale, TranslationDict> = {
     },
   },
   en: {
-    appName: 'PinkBird',
+    appName: 'Roselle',
     common: {
       days: (n) => `${n} ${n === 1 ? 'day' : 'days'}`,
       dayShort: 'd',

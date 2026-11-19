@@ -1,12 +1,12 @@
-import { PinkBirdDatabase } from './db';
+import { RoselleDatabase } from './db';
 import { DexieCycleRepository } from './dexie-repository';
 
 describe('DexieCycleRepository', () => {
-  let db: PinkBirdDatabase;
+  let db: RoselleDatabase;
   let repo: DexieCycleRepository;
 
   beforeEach(() => {
-    db = new PinkBirdDatabase(`TestDB_${Math.random().toString(36).slice(2)}`);
+    db = new RoselleDatabase(`TestDB_${Math.random().toString(36).slice(2)}`);
     repo = new DexieCycleRepository(db);
   });
 

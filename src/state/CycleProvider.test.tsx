@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { PinkBirdDatabase } from '../data/db';
+import { RoselleDatabase } from '../data/db';
 import { DexieCycleRepository } from '../data/dexie-repository';
 import { CycleProvider, useCycle } from './CycleProvider';
 
@@ -29,7 +29,7 @@ function Probe() {
 
 describe('CycleProvider', () => {
   it('completes onboarding, seeds period clamped to today, and updates cycle status', async () => {
-    const db = new PinkBirdDatabase(`ProviderTest_${Math.random().toString(36).slice(2)}`);
+    const db = new RoselleDatabase(`ProviderTest_${Math.random().toString(36).slice(2)}`);
     const repo = new DexieCycleRepository(db);
     const user = userEvent.setup();
 

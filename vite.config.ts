@@ -11,8 +11,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['icons/icon-192.svg', 'icons/icon-512.svg'],
       manifest: {
-        name: 'PinkBird Cycle Tracker',
-        short_name: 'PinkBird',
+        name: 'Roselle Cycle Tracker',
+        short_name: 'Roselle',
         description: 'Private local-first menstrual cycle and daily health tracker',
         theme_color: '#fcf7f8',
         background_color: '#fcf7f8',

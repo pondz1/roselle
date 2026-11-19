@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { PinkBirdDatabase } from '../../data/db';
+import { RoselleDatabase } from '../../data/db';
 import { DexieCycleRepository } from '../../data/dexie-repository';
 import { I18nProvider } from '../../i18n/I18nProvider';
 import { CycleProvider, useCycle } from '../../state/CycleProvider';
@@ -29,7 +29,7 @@ function Harness() {
 
 describe('OnboardingFlow', () => {
   it('completes 3-step onboarding with date and custom lengths', async () => {
-    const db = new PinkBirdDatabase(`OnboardTest_${Math.random().toString(36).slice(2)}`);
+    const db = new RoselleDatabase(`OnboardTest_${Math.random().toString(36).slice(2)}`);
     const repo = new DexieCycleRepository(db);
     const user = userEvent.setup();
 
@@ -55,7 +55,7 @@ describe('OnboardingFlow', () => {
   });
 
   it('allows skipping onboarding without seeding logs', async () => {
-    const db = new PinkBirdDatabase(`OnboardSkip_${Math.random().toString(36).slice(2)}`);
+    const db = new RoselleDatabase(`OnboardSkip_${Math.random().toString(36).slice(2)}`);
     const repo = new DexieCycleRepository(db);
     const user = userEvent.setup();
 

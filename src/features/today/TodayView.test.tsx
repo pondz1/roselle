@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { PinkBirdDatabase } from '../../data/db';
+import { RoselleDatabase } from '../../data/db';
 import { DexieCycleRepository } from '../../data/dexie-repository';
 import { I18nProvider } from '../../i18n/I18nProvider';
 import { CycleProvider, useCycle } from '../../state/CycleProvider';
@@ -23,7 +23,7 @@ function Harness({ onOpenLog }: { onOpenLog: (date: string) => void }) {
 
 describe('TodayView', () => {
   it('shows honest empty state and logs period in one tap', async () => {
-    const db = new PinkBirdDatabase(`TodayEmpty_${Math.random().toString(36).slice(2)}`);
+    const db = new RoselleDatabase(`TodayEmpty_${Math.random().toString(36).slice(2)}`);
     const repo = new DexieCycleRepository(db);
     await repo.updateSettings({ onboardingCompleted: true });
     const user = userEvent.setup();
@@ -48,7 +48,7 @@ describe('TodayView', () => {
   });
 
   it('shows late period status clearly when overdue', async () => {
-    const db = new PinkBirdDatabase(`TodayLate_${Math.random().toString(36).slice(2)}`);
+    const db = new RoselleDatabase(`TodayLate_${Math.random().toString(36).slice(2)}`);
     const repo = new DexieCycleRepository(db);
     await repo.updateSettings({ onboardingCompleted: true, defaultCycleLength: 28 });
     await repo.upsertLog({

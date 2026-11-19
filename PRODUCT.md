@@ -10,7 +10,7 @@ Individuals tracking their menstrual cycle, daily symptoms, moods, and fertility
 
 ## Product Purpose
 
-Provide a PinkBird-inspired, private, local-first menstrual cycle tracker PWA (Thai default with instant English toggle) that delivers accurate cycle predictions, ovulation and fertile window estimates, effortless daily health logging, and clear historical trends while keeping all personal data strictly on-device and architecturally ready for optional cloud sync later.
+Provide Roselle, a private, local-first menstrual cycle tracker PWA (Thai default with instant English toggle) that delivers accurate cycle predictions, ovulation and fertile window estimates, effortless daily health logging, and clear historical trends while keeping all personal data strictly on-device and architecturally ready for optional cloud sync later.
 
 ## Brand Personality
 

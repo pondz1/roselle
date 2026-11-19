@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { PinkBirdDatabase } from '../../data/db';
+import { RoselleDatabase } from '../../data/db';
 import { DexieCycleRepository } from '../../data/dexie-repository';
 import { I18nProvider } from '../../i18n/I18nProvider';
 import { CycleProvider, useCycle } from '../../state/CycleProvider';
@@ -23,7 +23,7 @@ function Harness({ onSelectDate }: { onSelectDate: (date: string) => void }) {
 
 describe('CalendarView', () => {
   it('renders phase markers and opens selected date on tap', async () => {
-    const db = new PinkBirdDatabase(`CalTest_${Math.random().toString(36).slice(2)}`);
+    const db = new RoselleDatabase(`CalTest_${Math.random().toString(36).slice(2)}`);
     const repo = new DexieCycleRepository(db);
     await repo.updateSettings({ onboardingCompleted: true, locale: 'en' });
     await repo.bulkSetPeriodDays([
@@ -54,7 +54,7 @@ describe('CalendarView', () => {
   });
 
   it('supports multi-day period edit mode and persists bulk changes', async () => {
-    const db = new PinkBirdDatabase(`CalBulk_${Math.random().toString(36).slice(2)}`);
+    const db = new RoselleDatabase(`CalBulk_${Math.random().toString(36).slice(2)}`);
     const repo = new DexieCycleRepository(db);
     await repo.updateSettings({ onboardingCompleted: true, locale: 'en' });
     const user = userEvent.setup();

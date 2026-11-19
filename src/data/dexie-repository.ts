@@ -6,7 +6,7 @@ import {
   type ISODate,
   type UserSettings,
 } from '../domain/types';
-import { PinkBirdDatabase } from './db';
+import { RoselleDatabase } from './db';
 import type { BackupSnapshot, CycleRepository } from './repository';
 
 function isEmptyLogInput(input: DailyLogInput): boolean {
@@ -20,9 +20,9 @@ function isEmptyLogInput(input: DailyLogInput): boolean {
 }
 
 export class DexieCycleRepository implements CycleRepository {
-  private readonly db: PinkBirdDatabase;
+  private readonly db: RoselleDatabase;
 
-  constructor(db: PinkBirdDatabase = new PinkBirdDatabase()) {
+  constructor(db: RoselleDatabase = new RoselleDatabase()) {
     this.db = db;
   }
 

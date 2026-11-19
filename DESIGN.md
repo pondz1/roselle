@@ -1,5 +1,5 @@
 ---
-name: PinkBird-style Period Tracker
+name: Roselle Period Tracker
 description: Warm, private, local-first mobile PWA for menstrual cycle tracking, ovulation predictions, and quick daily symptom logging.
 colors:
   blush-canvas: "oklch(0.985 0.008 15)"
@@ -89,13 +89,13 @@ components:
     height: "68px"
 ---
 
-# Design System: PinkBird-style Period Tracker
+# Design System: Roselle Period Tracker
 
 ## 1. Overview
 
 **Creative North Star: "The Morning Notebook"**
 
-This interface is a calm, warm, tactile personal cycle companion designed for quick daily check-ins on a phone screen. Inspired by PinkBird's approachable warmth and clarity, it avoids both cold clinical portals and bloated content-feed apps. On mobile devices it runs full-bleed; on wider desktop viewports it centers within a clean 430px phone frame resting over a softly tinted blush backdrop.
+This interface is a calm, warm, tactile personal cycle companion designed for quick daily check-ins on a phone screen. Crafted for approachable warmth and clarity, it avoids both cold clinical portals and bloated content-feed apps. On mobile devices it runs full-bleed; on wider desktop viewports it centers within a clean 430px phone frame resting over a softly tinted blush backdrop.
 
 Surfaces rely on quiet tonal shifts, hairline rose dividers, and intentional whitespace rhythm rather than wrapping every element in boxes. Motion stays crisp and informative (150 to 220ms exponential ease-out, zero bounce, zero decorative page-load choreography) and respects `prefers-reduced-motion`.
 

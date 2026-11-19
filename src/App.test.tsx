@@ -1,12 +1,12 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { PinkBirdDatabase } from './data/db';
+import { RoselleDatabase } from './data/db';
 import { DexieCycleRepository } from './data/dexie-repository';
 import { App } from './App';
 
 describe('App full integration', () => {
   it('completes onboarding, switches tabs and languages, and displays insights and settings', async () => {
-    const db = new PinkBirdDatabase(`AppInt_${Math.random().toString(36).slice(2)}`);
+    const db = new RoselleDatabase(`AppInt_${Math.random().toString(36).slice(2)}`);
     const repo = new DexieCycleRepository(db);
     const user = userEvent.setup();
 

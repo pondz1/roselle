@@ -1,4 +1,4 @@
-# PinkBird-style Period Tracker PWA Design Specification
+# Roselle Period Tracker PWA Design Specification
 
 **Date:** 2026-11-19  
 **Status:** Approved Design (Pending Final Spec Review)  
@@ -9,13 +9,13 @@
 
 ## 1. Purpose and Scope
 
-Build a private, local-first menstrual cycle tracking Progressive Web App inspired by PinkBird. Users can open the app on mobile or desktop immediately without creating an account, track their menstrual periods, view upcoming cycle/ovulation/fertile window predictions, log daily symptoms and moods in seconds, and inspect personal cycle history and trends.
+Build Roselle, a private, local-first menstrual cycle tracking Progressive Web App. Users can open the app on mobile or desktop immediately without creating an account, track their menstrual periods, view upcoming cycle/ovulation/fertile window predictions, log daily symptoms and moods in seconds, and inspect personal cycle history and trends.
 
 ### In Scope (v1)
 - Mobile-first PWA installable on home screen and fully functional offline.
 - Bilingual UI: Thai (`th`) default with instant switch to English (`en`).
 - Quick 3-step first-run onboarding (with skip option).
-- **Today (Dashboard)**: Signature PinkBird-style circular cycle ring, cycle day, countdown or active period day or late-period alert, daily conception chance badge, one-tap start/end period action, and today's quick daily log summary.
+- **Today (Dashboard)**: Signature circular cycle ring, cycle day, countdown or active period day or late-period alert, daily conception chance badge, one-tap start/end period action, and today's quick daily log summary.
 - **Calendar**: Monthly calendar grid showing historical logged period days, predicted upcoming period days (6-month projection), fertile window, ovulation day, and logged-symptom dots; tap any date to view status and edit logs; multi-day period edit mode for bulk adjustments.
 - **Insights**: Summary statistics (average cycle length, average period length, cycle variation), recent cycle length trend chart, chronological period history list, and top logged symptoms/moods frequency breakdown.
 - **Settings**: Configurable default cycle length, default period length, luteal phase length (10-16 days), TH/EN language toggle, JSON Export/Import backup with strict schema validation, and confirmed local data reset.
@@ -173,7 +173,7 @@ export interface CycleRepository {
 ```
 
 ### 4.2 Local Implementation (`src/data/dexie-repository.ts`)
-- IndexedDB database `PinkBirdCycleDB` (version 1):
+- IndexedDB database `RoselleCycleDB` (version 1):
   - `logs`: `&date, updatedAt, syncStatus`
   - `settings`: `&id`
 - Any write automatically stamps `updatedAt = new Date().toISOString()` and `syncStatus = 'pending'` (ready for a future `SyncedCycleRepository` decorator to push dirty records and pull remote deltas).
@@ -268,8 +268,8 @@ src/
 
 - Configured via `vite-plugin-pwa` with `registerType: 'autoUpdate'`, precaching static assets and Google Fonts fallback.
 - Web App Manifest:
-  - `name`: "PinkBird Cycle Tracker"
-  - `short_name`: "PinkBird"
+  - `name`: "Roselle Cycle Tracker"
+  - `short_name`: "Roselle"
   - `display`: `"standalone"`
   - `theme_color`: `"#fcf7f8"`
   - `background_color`: `"#fcf7f8"`

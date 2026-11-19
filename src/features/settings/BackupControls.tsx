@@ -26,7 +26,7 @@ export function BackupControls() {
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement('a');
     anchor.href = url;
-    anchor.download = `pinkbird-backup-${today}.json`;
+    anchor.download = `roselle-backup-${today}.json`;
     anchor.click();
     URL.revokeObjectURL(url);
     setFeedback({ kind: 'success', text: t.settings.exportSuccess });

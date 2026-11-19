@@ -1,0 +1,30 @@
+:root {
+  --color-blush-canvas: oklch(0.985 0.008 15);
+  --color-warm-surface: oklch(0.996 0.004 15);
+  --color-tinted-subtle: oklch(0.962 0.013 15);
+  --color-rose-hairline: oklch(0.912 0.015 15);
+  --color-ink-primary: oklch(0.24 0.022 15);
+  --color-ink-secondary: oklch(0.47 0.022 15);
+  --color-ink-muted: oklch(0.60 0.018 15);
+
+  --color-coral-rose: oklch(0.61 0.175 12);
+  --color-coral-rose-hover: oklch(0.55 0.18 12);
+  --color-coral-rose-soft: oklch(0.945 0.038 12);
+  --color-coral-rose-ink: oklch(0.45 0.155 12);
+  --color-predicted-blush: oklch(0.935 0.042 12);
+
+  --color-fertile-sage: oklch(0.54 0.115 168);
+  --color-fertile-sage-soft: oklch(0.935 0.034 168);
+  --color-fertile-sage-ink: oklch(0.39 0.095 168);
+
+  --color-amber-late: oklch(0.64 0.14 68);
+  --color-amber-late-soft: oklch(0.95 0.04 75);
+  --color-danger-ink: oklch(0.52 0.18 22);
+  --color-danger-soft: oklch(0.95 0.035 22);
+
+  --font-sans: "Noto Sans Thai", "Inter", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-fast: 160ms;
+  --duration-base: 210ms;
+  --shadow-sheet: 0 -8px 30px oklch(0.24 0.03 15 / 0.10);
+}

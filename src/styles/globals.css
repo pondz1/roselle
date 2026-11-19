@@ -1,0 +1,68 @@
+@import "tailwindcss";
+@import "./tokens.css";
+
+@theme inline {
+  --color-blush-canvas: var(--color-blush-canvas);
+  --color-warm-surface: var(--color-warm-surface);
+  --color-tinted-subtle: var(--color-tinted-subtle);
+  --color-rose-hairline: var(--color-rose-hairline);
+  --color-ink-primary: var(--color-ink-primary);
+  --color-ink-secondary: var(--color-ink-secondary);
+  --color-ink-muted: var(--color-ink-muted);
+  --color-coral-rose: var(--color-coral-rose);
+  --color-coral-rose-hover: var(--color-coral-rose-hover);
+  --color-coral-rose-soft: var(--color-coral-rose-soft);
+  --color-coral-rose-ink: var(--color-coral-rose-ink);
+  --color-predicted-blush: var(--color-predicted-blush);
+  --color-fertile-sage: var(--color-fertile-sage);
+  --color-fertile-sage-soft: var(--color-fertile-sage-soft);
+  --color-fertile-sage-ink: var(--color-fertile-sage-ink);
+  --color-amber-late: var(--color-amber-late);
+  --color-amber-late-soft: var(--color-amber-late-soft);
+  --color-danger-ink: var(--color-danger-ink);
+  --color-danger-soft: var(--color-danger-soft);
+  --font-sans: var(--font-sans);
+}
+
+@layer base {
+  html,
+  body {
+    background-color: var(--color-blush-canvas);
+    color: var(--color-ink-primary);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    margin: 0;
+    padding: 0;
+  }
+
+  button,
+  [role="button"] {
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    outline: 2px solid var(--color-coral-rose);
+    outline-offset: 2px;
+  }
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

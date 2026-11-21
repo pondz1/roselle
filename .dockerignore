@@ -1,0 +1,10 @@
+node_modules
+dist
+dev-dist
+.vite
+.git
+coverage
+docs
+.DS_Store
+*.test.ts
+*.test.tsx

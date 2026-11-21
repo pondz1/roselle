@@ -1,6 +1,7 @@
 import type {
   ActivityId,
   ConceptionChance,
+  CycleStatus,
   FlowLevel,
   Locale,
   MoodId,
@@ -95,6 +96,23 @@ export interface TranslationDict {
     addDailyLog: string;
     emptyTitle: string;
     emptyBody: string;
+    wheelAriaLabel: string;
+    wheelDayAriaLabel: (day: number, dateStr: string) => string;
+    wheelBackToToday: string;
+    wheelPhases: {
+      period: string;
+      ovulation: string;
+      fertile: string;
+      follicular: string;
+      luteal: string;
+    };
+    phaseGuide: Record<Exclude<CycleStatus, 'no_data'>, { title: string; body: string }>;
+  };
+  pwa: {
+    installTitle: string;
+    installBodyPrompt: string;
+    installAction: string;
+    installBodyIos: string;
   };
   calendar: {
     title: string;
@@ -134,6 +152,17 @@ export interface TranslationDict {
     activitiesSection: string;
     noteSection: string;
     notePlaceholder: string;
+    trackersSection: string;
+    weightLabel: string;
+    weightUnit: string;
+    weightPlaceholder: string;
+    weightError: string;
+    bbtLabel: string;
+    bbtUnit: string;
+    bbtPlaceholder: string;
+    bbtError: string;
+    pillLabel: string;
+    pillTaken: string;
     statusLoggedPeriod: string;
     statusPredictedPeriod: string;
     statusOvulation: string;
@@ -173,6 +202,32 @@ export interface TranslationDict {
     languageTitle: string;
     languageTh: string;
     languageEn: string;
+    trackersTitle: string;
+    trackersDescription: string;
+    trackerWeight: string;
+    trackerBbt: string;
+    trackerPill: string;
+    pinTitle: string;
+    pinDescription: string;
+    pinStatusOn: string;
+    pinStatusOff: string;
+    pinSetupButton: string;
+    pinChangeButton: string;
+    pinDisableButton: string;
+    pinLockNowButton: string;
+    pinSetupTitle: string;
+    pinConfirmTitle: string;
+    pinVerifyCurrentTitle: string;
+    pinNewTitle: string;
+    pinDisableTitle: string;
+    pinMismatchError: string;
+    pinWrongError: string;
+    pinSavedFeedback: string;
+    pinChangedFeedback: string;
+    pinDisabledFeedback: string;
+    pinUnlockTitle: string;
+    pinUnlockSubtitle: string;
+    pinDeleteDigit: string;
     backupTitle: string;
     backupDescription: string;
     exportButton: string;
@@ -299,6 +354,52 @@ export const translations: Record<Locale, TranslationDict> = {
       addDailyLog: 'บันทึกอาการและอารมณ์',
       emptyTitle: 'ยังไม่มีข้อมูลรอบเดือน',
       emptyBody: 'แตะบันทึกวันแรกของประจำเดือนเพื่อเริ่มคำนวณรอบถัดไปและวันไข่ตก',
+      wheelAriaLabel: 'วงล้อรอบเดือนแบบโต้ตอบได้',
+      wheelDayAriaLabel: (day, dateStr) => `วันที่ ${day} ของรอบเดือน (${dateStr})`,
+      wheelBackToToday: 'กลับสู่วันนี้',
+      wheelPhases: {
+        period: 'ช่วงประจำเดือน',
+        ovulation: 'วันไข่ตก (คาดการณ์)',
+        fertile: 'ช่วงเจริญพันธุ์',
+        follicular: 'ระยะฟอลลิคูลาร์',
+        luteal: 'ระยะลูเทียล',
+      },
+      phaseGuide: {
+        period: {
+          title: 'คำแนะนำช่วงประจำเดือน',
+          body: 'จิบน้ำอุ่นให้เพียงพอ พักผ่อนมากขึ้น และประคบอุ่นหากมีอาการปวดท้องน้อย',
+        },
+        period_due_today: {
+          title: 'วันครบกำหนดรอบใหม่',
+          body: 'เตรียมผ้าอนามัยติดตัวไว้ และแตะบันทึกวันแรกได้ทันทีเมื่อประจำเดือนมา',
+        },
+        late: {
+          title: 'ประจำเดือนคลาดเคลื่อนจากคาดการณ์',
+          body: 'รอบเดือนสามารถเลื่อนได้จากความเครียด การพักผ่อน หรือฮอร์โมน หากมาแล้วแตะบันทึกได้ทันที',
+        },
+        ovulation: {
+          title: 'คำแนะนำวันไข่ตก',
+          body: 'ระดับพลังงานมักสูงขึ้นและมูกปากมดลูกใสขึ้น โอกาสตั้งครรภ์สูงสุดในรอบนี้',
+        },
+        fertile: {
+          title: 'คำแนะนำช่วงเจริญพันธุ์',
+          body: 'อยู่ในช่วงใกล้ตกไข่ เหมาะกับการติดตามอุณหภูมิร่างกายหรือการวางแผนมีบุตร',
+        },
+        follicular: {
+          title: 'คำแนะนำระยะฟอลลิคูลาร์',
+          body: 'หลังประจำเดือนหมด ร่างกายค่อยๆ ฟื้นพลังงาน เหมาะกับกิจกรรมที่ใช้สมาธิและออกกำลังกาย',
+        },
+        luteal: {
+          title: 'คำแนะนำระยะลูเทียล',
+          body: 'อาจเริ่มอ่อนเพลีย คัดตึงหน้าอก หรืออารมณ์อ่อนไหวง่าย แนะนำลดคาเฟอีนและนอนให้พอ',
+        },
+      },
+    },
+    pwa: {
+      installTitle: 'เพิ่ม Roselle ลงหน้าจอโฮม',
+      installBodyPrompt: 'เปิดใช้งานได้ทันทีเหมือนแอปและใช้งานออฟไลน์ได้เต็มรูปแบบ',
+      installAction: 'ติดตั้ง',
+      installBodyIos: 'แตะปุ่มแชร์ด้านล่าง แล้วเลือก "เพิ่มไปยังหน้าจอโฮม" เพื่อใช้งานแบบเต็มหน้าจอ',
     },
     calendar: {
       title: 'ปฏิทินรอบเดือน',
@@ -338,6 +439,17 @@ export const translations: Record<Locale, TranslationDict> = {
       activitiesSection: 'กิจกรรม',
       noteSection: 'โน้ตเพิ่มเติม',
       notePlaceholder: 'จดบันทึกสั้นๆ สำหรับวันนี้...',
+      trackersSection: 'บันทึกเสริม',
+      weightLabel: 'น้ำหนัก',
+      weightUnit: 'กก.',
+      weightPlaceholder: 'เช่น 52.5',
+      weightError: 'กรุณาระบุน้ำหนักระหว่าง 20 ถึง 250 กก.',
+      bbtLabel: 'อุณหภูมิร่างกาย (BBT)',
+      bbtUnit: '°C',
+      bbtPlaceholder: 'เช่น 36.55',
+      bbtError: 'กรุณาระบุอุณหภูมิระหว่าง 34.0 ถึง 42.0 °C',
+      pillLabel: 'ยาคุมกำเนิดรายวัน',
+      pillTaken: 'ทานยาคุมแล้ว',
       statusLoggedPeriod: 'วันประจำเดือน',
       statusPredictedPeriod: 'คาดการณ์ประจำเดือน',
       statusOvulation: 'วันไข่ตก (คาดการณ์)',
@@ -405,6 +517,32 @@ export const translations: Record<Locale, TranslationDict> = {
       languageTitle: 'ภาษา',
       languageTh: 'ไทย',
       languageEn: 'English',
+      trackersTitle: 'หมวดบันทึกเสริม',
+      trackersDescription: 'เปิดเฉพาะรายการที่ต้องการให้แสดงในหน้าบันทึกรายวัน',
+      trackerWeight: 'น้ำหนัก (กก.)',
+      trackerBbt: 'อุณหภูมิร่างกายพื้นฐาน BBT (°C)',
+      trackerPill: 'การทานยาคุมกำเนิดรายวัน',
+      pinTitle: 'ล็อกแอปด้วยรหัส PIN',
+      pinDescription: 'ปกป้องข้อมูลบนเครื่องด้วยรหัส 4 หลักทุกครั้งที่เปิดแอป',
+      pinStatusOn: 'เปิดใช้งานแล้ว',
+      pinStatusOff: 'ปิดอยู่',
+      pinSetupButton: 'ตั้งรหัส PIN 4 หลัก',
+      pinChangeButton: 'เปลี่ยนรหัส PIN',
+      pinDisableButton: 'ปิดรหัส PIN',
+      pinLockNowButton: 'ล็อกตอนนี้',
+      pinSetupTitle: 'ตั้งรหัส PIN 4 หลัก',
+      pinConfirmTitle: 'ยืนยันรหัส PIN อีกครั้ง',
+      pinVerifyCurrentTitle: 'ใส่รหัส PIN ปัจจุบัน',
+      pinNewTitle: 'ตั้งรหัส PIN ใหม่',
+      pinDisableTitle: 'ยืนยันรหัสเพื่อปิดการล็อก',
+      pinMismatchError: 'รหัส PIN ไม่ตรงกัน กรุณาลองอีกครั้ง',
+      pinWrongError: 'รหัส PIN ไม่ถูกต้อง',
+      pinSavedFeedback: 'บันทึกรหัส PIN เรียบร้อยแล้ว',
+      pinChangedFeedback: 'เปลี่ยนรหัส PIN เรียบร้อยแล้ว',
+      pinDisabledFeedback: 'ปิดการล็อกด้วย PIN แล้ว',
+      pinUnlockTitle: 'ใส่รหัส PIN เพื่อเปิด Roselle',
+      pinUnlockSubtitle: 'รหัสของคุณถูกเก็บแบบเข้ารหัสบนเครื่องนี้เท่านั้น',
+      pinDeleteDigit: 'ลบตัวเลข',
       backupTitle: 'สำรองและกู้คืนข้อมูล',
       backupDescription: 'ส่งออกข้อมูลเป็นไฟล์ JSON เพื่อเก็บสำรอง หรือกู้คืนลงเครื่องนี้',
       exportButton: 'ส่งออก JSON',
@@ -536,6 +674,52 @@ export const translations: Record<Locale, TranslationDict> = {
       addDailyLog: 'Log symptoms and mood',
       emptyTitle: 'No cycle data yet',
       emptyBody: 'Log your first period day to start estimating upcoming cycles and ovulation.',
+      wheelAriaLabel: 'Interactive cycle wheel',
+      wheelDayAriaLabel: (day, dateStr) => `Cycle Day ${day} (${dateStr})`,
+      wheelBackToToday: 'Back to today',
+      wheelPhases: {
+        period: 'Period Phase',
+        ovulation: 'Estimated Ovulation',
+        fertile: 'Fertile Window',
+        follicular: 'Follicular Phase',
+        luteal: 'Luteal Phase',
+      },
+      phaseGuide: {
+        period: {
+          title: 'Period care guide',
+          body: 'Stay hydrated, rest a little extra, and use gentle warmth if cramps show up.',
+        },
+        period_due_today: {
+          title: 'Cycle due today',
+          body: 'Keep supplies handy and tap Log Period Today as soon as bleeding starts.',
+        },
+        late: {
+          title: 'Slightly late cycle',
+          body: 'Cycles naturally shift with sleep, stress, or routine changes. Log when your flow begins.',
+        },
+        ovulation: {
+          title: 'Ovulation day guide',
+          body: 'Energy and cervical mucus clarity often peak around now alongside the highest conception chance.',
+        },
+        fertile: {
+          title: 'Fertile window guide',
+          body: 'Approaching estimated ovulation. Basal temperature or symptom notes can help pinpoint your pattern.',
+        },
+        follicular: {
+          title: 'Follicular phase guide',
+          body: 'Rising estrogen often brings steadier energy after menstruation, well suited for focus and movement.',
+        },
+        luteal: {
+          title: 'Luteal phase guide',
+          body: 'Energy can gradually wind down before your next period. Lighter caffeine and steady sleep help.',
+        },
+      },
+    },
+    pwa: {
+      installTitle: 'Add Roselle to Home Screen',
+      installBodyPrompt: 'Launch like a native app anytime with full offline access.',
+      installAction: 'Install',
+      installBodyIos: 'Tap Share in Safari, then choose "Add to Home Screen" for full-screen offline use.',
     },
     calendar: {
       title: 'Cycle Calendar',
@@ -575,6 +759,17 @@ export const translations: Record<Locale, TranslationDict> = {
       activitiesSection: 'Activity',
       noteSection: 'Note',
       notePlaceholder: 'Add a quick note for this day...',
+      trackersSection: 'Health Trackers',
+      weightLabel: 'Weight',
+      weightUnit: 'kg',
+      weightPlaceholder: 'e.g. 52.5',
+      weightError: 'Enter a weight between 20 and 250 kg.',
+      bbtLabel: 'Basal Body Temp (BBT)',
+      bbtUnit: '°C',
+      bbtPlaceholder: 'e.g. 36.55',
+      bbtError: 'Enter a temperature between 34.0 and 42.0 °C.',
+      pillLabel: 'Daily contraceptive pill',
+      pillTaken: 'Pill taken',
       statusLoggedPeriod: 'Logged Period',
       statusPredictedPeriod: 'Predicted Period',
       statusOvulation: 'Estimated Ovulation',
@@ -642,6 +837,32 @@ export const translations: Record<Locale, TranslationDict> = {
       languageTitle: 'Language',
       languageTh: 'ไทย',
       languageEn: 'English',
+      trackersTitle: 'Optional Trackers',
+      trackersDescription: 'Choose extra health fields to show in Daily Log.',
+      trackerWeight: 'Weight (kg)',
+      trackerBbt: 'Basal Body Temperature (°C)',
+      trackerPill: 'Daily contraceptive pill',
+      pinTitle: 'App PIN Lock',
+      pinDescription: 'Require a local 4-digit PIN whenever you open the app.',
+      pinStatusOn: 'Enabled',
+      pinStatusOff: 'Off',
+      pinSetupButton: 'Set 4-digit PIN',
+      pinChangeButton: 'Change PIN',
+      pinDisableButton: 'Disable PIN',
+      pinLockNowButton: 'Lock now',
+      pinSetupTitle: 'Set 4-digit PIN',
+      pinConfirmTitle: 'Confirm your PIN',
+      pinVerifyCurrentTitle: 'Enter current PIN',
+      pinNewTitle: 'Enter new PIN',
+      pinDisableTitle: 'Enter PIN to disable lock',
+      pinMismatchError: 'PINs do not match. Try again.',
+      pinWrongError: 'Incorrect PIN.',
+      pinSavedFeedback: 'PIN lock enabled.',
+      pinChangedFeedback: 'PIN updated.',
+      pinDisabledFeedback: 'PIN lock disabled.',
+      pinUnlockTitle: 'Enter PIN to unlock Roselle',
+      pinUnlockSubtitle: 'Your PIN is verified locally on this device.',
+      pinDeleteDigit: 'Delete digit',
       backupTitle: 'Backup & Restore',
       backupDescription: 'Export your data as JSON for safekeeping or restore an earlier backup.',
       exportButton: 'Export JSON',

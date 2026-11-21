@@ -104,4 +104,64 @@ describe('App full integration', () => {
     secondRender.unmount();
     await db.delete();
   });
+
+  it('supports PIN privacy lock on /app without locking the public landing page /', async () => {
+    const db = new RoselleDatabase(`AppPin_${Math.random().toString(36).slice(2)}`);
+    const repo = new DexieCycleRepository(db);
+    await repo.updateSettings({ onboardingCompleted: true, locale: 'th' });
+    const user = userEvent.setup();
+
+    const firstMount = render(
+      <App repository={repo} todayOverride="2026-11-19" initialPath="/app" />,
+    );
+
+    // Go to Settings and set up a 4-digit PIN (2468)
+    await user.click(await screen.findByRole('button', { name: 'ตั้งค่า' }));
+    await user.click(await screen.findByRole('button', { name: 'ตั้งรหัส PIN 4 หลัก' }));
+
+    expect(await screen.findByRole('heading', { name: 'ตั้งรหัส PIN 4 หลัก' })).toBeInTheDocument();
+    for (const d of ['2', '4', '6', '8']) {
+      await user.click(screen.getByRole('button', { name: d }));
+    }
+
+    expect(await screen.findByText('ยืนยันรหัส PIN อีกครั้ง')).toBeInTheDocument();
+    for (const d of ['2', '4', '6', '8']) {
+      await user.click(screen.getByRole('button', { name: d }));
+    }
+
+    expect(await screen.findByText('บันทึกรหัส PIN เรียบร้อยแล้ว')).toBeInTheDocument();
+    firstMount.unmount();
+
+    // Opening /app on next launch requires PIN unlock
+    const lockedMount = render(
+      <App repository={repo} todayOverride="2026-11-19" initialPath="/app" />,
+    );
+    expect(await screen.findByText('ใส่รหัส PIN เพื่อเปิด Roselle')).toBeInTheDocument();
+
+    // Wrong PIN shows error
+    for (const d of ['1', '1', '1', '1']) {
+      await user.click(screen.getByRole('button', { name: d }));
+    }
+    expect(await screen.findByRole('alert')).toHaveTextContent('รหัส PIN ไม่ถูกต้อง');
+
+    // Correct PIN unlocks /app
+    for (const d of ['2', '4', '6', '8']) {
+      await user.click(screen.getByRole('button', { name: d }));
+    }
+    expect(await screen.findByText('ยังไม่มีข้อมูลรอบเดือน')).toBeInTheDocument();
+    lockedMount.unmount();
+
+    // Public landing page / stays unlocked even with PIN enabled
+    const landingMount = render(
+      <App repository={repo} todayOverride="2026-11-19" initialPath="/" />,
+    );
+    expect(
+      await screen.findByRole('heading', {
+        name: 'ติดตามรอบเดือนและวันไข่ตกอย่างเป็นส่วนตัว บนเครื่องของคุณเอง',
+      }),
+    ).toBeInTheDocument();
+
+    landingMount.unmount();
+    await db.delete();
+  });
 });

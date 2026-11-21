@@ -5,7 +5,9 @@ import { formatFullDate, formatShortDate } from '../../domain/date-utils';
 import type { ISODate } from '../../domain/types';
 import { useI18n } from '../../i18n/I18nProvider';
 import { useCycle } from '../../state/CycleProvider';
+import { InstallBanner } from '../pwa/InstallBanner';
 import { CycleRing } from './CycleRing';
+import { PhaseGuideCard } from './PhaseGuideCard';
 import { TodayLogSummary } from './TodayLogSummary';
 
 interface TodayViewProps {
@@ -53,6 +55,8 @@ export function TodayView({ onOpenLog }: TodayViewProps) {
           ))}
         </div>
       </header>
+
+      <InstallBanner />
 
       {summary.status === 'no_data' ? (
         <div className="py-6">
@@ -110,6 +114,8 @@ export function TodayView({ onOpenLog }: TodayViewProps) {
               </p>
             </div>
           </div>
+
+          <PhaseGuideCard status={summary.status} />
         </section>
       )}
 

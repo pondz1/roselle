@@ -61,7 +61,10 @@ export function SelectedDayPanel({ date, onOpenDetails }: SelectedDayPanelProps)
       log!.symptoms.length > 0 ||
       log!.moods.length > 0 ||
       log!.activities.length > 0 ||
-      log!.note.trim().length > 0);
+      log!.note.trim().length > 0 ||
+      log!.weightKg != null ||
+      log!.bbtCelsius != null ||
+      log!.pillTaken === true);
 
   const handleToggleStart = async () => {
     if (isEpisodeStart && matchingEpisode && matchingEpisode.loggedDays.length === 1) {
@@ -210,6 +213,21 @@ export function SelectedDayPanel({ date, onOpenDetails }: SelectedDayPanelProps)
                     {t.dailyLog.activities[a]}
                   </span>
                 ))}
+                {log!.weightKg != null ? (
+                  <span className="inline-flex items-center rounded-[8px] bg-tinted-subtle text-ink-primary px-2.5 py-1 text-[0.75rem] tabular-nums">
+                    {log!.weightKg} {t.dailyLog.weightUnit}
+                  </span>
+                ) : null}
+                {log!.bbtCelsius != null ? (
+                  <span className="inline-flex items-center rounded-[8px] bg-tinted-subtle text-ink-primary px-2.5 py-1 text-[0.75rem] tabular-nums">
+                    {log!.bbtCelsius} {t.dailyLog.bbtUnit}
+                  </span>
+                ) : null}
+                {log!.pillTaken ? (
+                  <span className="inline-flex items-center rounded-[8px] bg-fertile-sage-soft text-fertile-sage-ink px-2.5 py-1 text-[0.75rem]">
+                    {t.dailyLog.pillTaken}
+                  </span>
+                ) : null}
               </div>
               {log!.note.trim() ? (
                 <p className="text-[0.8125rem] leading-relaxed text-ink-secondary bg-tinted-subtle/60 rounded-[12px] px-4 py-2.5">

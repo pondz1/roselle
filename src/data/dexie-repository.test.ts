@@ -103,4 +103,29 @@ describe('DexieCycleRepository', () => {
     expect(restoredLogs[0].note).toBe('Backed up');
     expect(restoredSettings.defaultCycleLength).toBe(31);
   });
+
+  it('strips PIN credentials on exportSnapshot and keeps optional tracker-only logs active', async () => {
+    await repo.updateSettings({ pinHash: 'abc123', pinSalt: 'salt123' });
+    await repo.upsertLog({
+      date: '2026-11-12',
+      flow: 'none',
+      symptoms: [],
+      moods: [],
+      activities: [],
+      note: '',
+      weightKg: 52.5,
+      bbtCelsius: 36.48,
+      pillTaken: true,
+    });
+
+    await repo.bulkSetPeriodDays([{ date: '2026-11-12', flow: 'medium' }]);
+    const dayLog = await repo.getLogByDate('2026-11-12');
+    expect(dayLog?.weightKg).toBe(52.5);
+    expect(dayLog?.bbtCelsius).toBe(36.48);
+    expect(dayLog?.pillTaken).toBe(true);
+
+    const snapshot = await repo.exportSnapshot();
+    expect(snapshot.settings.pinHash).toBeNull();
+    expect(snapshot.settings.pinSalt).toBeNull();
+  });
 });

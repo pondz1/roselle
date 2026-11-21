@@ -155,6 +155,9 @@ export function CycleProvider({ repository, todayOverride, children }: CycleProv
       moods: existing?.moods ?? [],
       activities: existing?.activities ?? [],
       note: existing?.note ?? '',
+      weightKg: existing?.weightKg ?? null,
+      bbtCelsius: existing?.bbtCelsius ?? null,
+      pillTaken: existing?.pillTaken ?? false,
     });
     const nextLogs = await repo.getAllLogs();
     setLogs(nextLogs);
@@ -170,6 +173,9 @@ export function CycleProvider({ repository, todayOverride, children }: CycleProv
       moods: existing.moods,
       activities: existing.activities,
       note: existing.note,
+      weightKg: existing.weightKg ?? null,
+      bbtCelsius: existing.bbtCelsius ?? null,
+      pillTaken: existing.pillTaken ?? false,
     });
     const nextLogs = await repo.getAllLogs();
     setLogs(nextLogs);

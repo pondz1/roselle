@@ -1,6 +1,7 @@
 import { isValidISODate } from '../domain/date-utils';
 import {
   ACTIVITY_IDS,
+  DEFAULT_OPTIONAL_TRACKERS,
   FLOW_LEVELS,
   MOOD_IDS,
   SYMPTOM_IDS,
@@ -8,6 +9,7 @@ import {
   type DailyLog,
   type FlowLevel,
   type MoodId,
+  type OptionalTrackersConfig,
   type SymptomId,
   type UserSettings,
 } from '../domain/types';
@@ -36,6 +38,39 @@ function isIntInRange(value: unknown, min: number, max: number): value is number
   return typeof value === 'number' && Number.isInteger(value) && value >= min && value <= max;
 }
 
+function parseOptionalTrackers(raw: unknown): OptionalTrackersConfig | null {
+  if (raw === undefined) {
+    return { ...DEFAULT_OPTIONAL_TRACKERS };
+  }
+  if (!isRecord(raw)) return null;
+  if (
+    typeof raw.weight !== 'boolean' ||
+    typeof raw.bbt !== 'boolean' ||
+    typeof raw.pill !== 'boolean'
+  ) {
+    return null;
+  }
+  return {
+    weight: raw.weight,
+    bbt: raw.bbt,
+    pill: raw.pill,
+  };
+}
+
+function parseOptionalMetric(
+  raw: unknown,
+  min: number,
+  max: number,
+): { ok: true; value: number | null } | { ok: false } {
+  if (raw === undefined || raw === null) {
+    return { ok: true, value: null };
+  }
+  if (typeof raw === 'number' && Number.isFinite(raw) && raw >= min && raw <= max) {
+    return { ok: true, value: raw };
+  }
+  return { ok: false };
+}
+
 function validateSettings(raw: unknown): UserSettings | null {
   if (!isRecord(raw)) return null;
   if (
@@ -47,6 +82,8 @@ function validateSettings(raw: unknown): UserSettings | null {
   }
   if (raw.locale !== 'th' && raw.locale !== 'en') return null;
   if (typeof raw.onboardingCompleted !== 'boolean') return null;
+  const enabledTrackers = parseOptionalTrackers(raw.enabledTrackers);
+  if (!enabledTrackers) return null;
   const updatedAt =
     typeof raw.updatedAt === 'string' && raw.updatedAt.length > 0
       ? raw.updatedAt
@@ -59,6 +96,9 @@ function validateSettings(raw: unknown): UserSettings | null {
     lutealPhaseLength: raw.lutealPhaseLength,
     locale: raw.locale,
     onboardingCompleted: raw.onboardingCompleted,
+    enabledTrackers,
+    pinHash: null,
+    pinSalt: null,
     updatedAt,
   };
 }
@@ -87,6 +127,12 @@ function validateLog(raw: unknown): DailyLog | null {
   }
   if (typeof raw.note !== 'string' || raw.note.length > 1000) return null;
 
+  const weightMetric = parseOptionalMetric(raw.weightKg, 20, 250);
+  if (!weightMetric.ok) return null;
+  const bbtMetric = parseOptionalMetric(raw.bbtCelsius, 34, 42);
+  if (!bbtMetric.ok) return null;
+  if (raw.pillTaken !== undefined && typeof raw.pillTaken !== 'boolean') return null;
+
   const updatedAt =
     typeof raw.updatedAt === 'string' && raw.updatedAt.length > 0
       ? raw.updatedAt
@@ -104,6 +150,9 @@ function validateLog(raw: unknown): DailyLog | null {
     moods: Array.from(new Set(raw.moods as MoodId[])),
     activities: Array.from(new Set(raw.activities as ActivityId[])),
     note: raw.note,
+    weightKg: weightMetric.value,
+    bbtCelsius: bbtMetric.value,
+    pillTaken: raw.pillTaken ?? false,
     updatedAt,
     deletedAt,
     syncStatus: 'pending',

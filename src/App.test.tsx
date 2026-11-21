@@ -5,12 +5,53 @@ import { DexieCycleRepository } from './data/dexie-repository';
 import { App } from './App';
 
 describe('App full integration', () => {
-  it('completes onboarding, switches tabs and languages, and displays insights and settings', async () => {
+  it('renders landing page at /, toggles preview & language, and navigates to /app', async () => {
+    const db = new RoselleDatabase(`LandingInt_${Math.random().toString(36).slice(2)}`);
+    const repo = new DexieCycleRepository(db);
+    const user = userEvent.setup();
+
+    window.history.replaceState({}, '', '/');
+    render(<App repository={repo} todayOverride="2026-11-19" initialPath="/" />);
+
+    expect(
+      await screen.findByRole('heading', {
+        name: 'ติดตามรอบเดือนและวันไข่ตกอย่างเป็นส่วนตัว บนเครื่องของคุณเอง',
+      }),
+    ).toBeInTheDocument();
+
+    // Switch preview tab to Calendar
+    await user.click(screen.getByRole('tab', { name: 'ปฏิทิน' }));
+    expect(screen.getByTestId('cal-day-2026-11-17')).toHaveAttribute(
+      'data-phase',
+      'logged-period',
+    );
+
+    // Switch language to English
+    await user.click(screen.getByRole('button', { name: 'EN' }));
+    expect(
+      await screen.findByRole('heading', {
+        name: 'Track your cycle and ovulation privately, strictly on your device',
+      }),
+    ).toBeInTheDocument();
+
+    // Navigate to /app via primary CTA
+    await user.click(screen.getByRole('button', { name: 'Start tracking' }));
+    expect(
+      await screen.findByText('Track your cycle privately'),
+    ).toBeInTheDocument();
+    expect(window.location.pathname).toBe('/app');
+
+    await db.delete();
+  });
+
+  it('completes onboarding, switches tabs and languages, and displays insights and settings at /app', async () => {
     const db = new RoselleDatabase(`AppInt_${Math.random().toString(36).slice(2)}`);
     const repo = new DexieCycleRepository(db);
     const user = userEvent.setup();
 
-    const firstRender = render(<App repository={repo} todayOverride="2026-11-19" />);
+    const firstRender = render(
+      <App repository={repo} todayOverride="2026-11-19" initialPath="/app" />,
+    );
 
     // 1. First-run onboarding
     expect(await screen.findByText('เริ่มติดตามรอบเดือนของคุณ')).toBeInTheDocument();
@@ -42,7 +83,9 @@ describe('App full integration', () => {
 
     firstRender.unmount();
 
-    const secondRender = render(<App repository={repo} todayOverride="2026-11-19" />);
+    const secondRender = render(
+      <App repository={repo} todayOverride="2026-11-19" initialPath="/app" />,
+    );
     await user.click(await screen.findByRole('button', { name: 'Insights' }));
     expect(await screen.findByText('Insights & Trends')).toBeInTheDocument();
     expect(screen.getByText('Cramps')).toBeInTheDocument();

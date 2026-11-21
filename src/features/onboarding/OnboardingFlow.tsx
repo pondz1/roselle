@@ -10,6 +10,7 @@ export function OnboardingFlow() {
 
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [lastPeriodStart, setLastPeriodStart] = useState<string>('');
+  const [dateFocused, setDateFocused] = useState(false);
   const [periodLength, setPeriodLength] = useState<number>(settings.defaultPeriodLength);
   const [cycleLength, setCycleLength] = useState<number>(settings.defaultCycleLength);
   const [submitting, setSubmitting] = useState(false);
@@ -107,15 +108,35 @@ export function OnboardingFlow() {
                 >
                   {t.onboarding.lastPeriodLabel}
                 </label>
-                <input
-                  id="onboarding-last-period"
-                  type="date"
-                  max={today}
-                  value={lastPeriodStart}
-                  onChange={(e) => setLastPeriodStart(e.target.value)}
-                  onInput={(e) => setLastPeriodStart(e.currentTarget.value)}
-                  className="w-full min-h-12 rounded-[10px] bg-tinted-subtle border border-rose-hairline px-4 py-3 text-[0.9375rem] text-ink-primary tabular-nums focus:bg-warm-surface"
-                />
+                <div className="relative w-full overflow-hidden rounded-[10px] bg-tinted-subtle border border-rose-hairline focus-within:bg-warm-surface focus-within:border-coral-rose transition-colors duration-[150ms]">
+                  {!lastPeriodStart && !dateFocused ? (
+                    <span
+                      aria-hidden="true"
+                      className="pointer-events-none absolute inset-y-0 left-4 flex items-center text-[0.9375rem] text-ink-muted"
+                    >
+                      {t.onboarding.lastPeriodPlaceholder}
+                    </span>
+                  ) : null}
+                  <input
+                    id="onboarding-last-period"
+                    type="date"
+                    max={today}
+                    value={lastPeriodStart}
+                    onFocus={() => setDateFocused(true)}
+                    onBlur={() => setDateFocused(false)}
+                    onChange={(e) => setLastPeriodStart(e.target.value)}
+                    onInput={(e) => setLastPeriodStart(e.currentTarget.value)}
+                    className={[
+                      'block w-full max-w-full min-w-0 min-h-12 bg-transparent px-4 py-3 pr-11 text-[0.9375rem] tabular-nums focus:outline-none',
+                      lastPeriodStart || dateFocused ? 'text-ink-primary' : 'text-transparent',
+                    ].join(' ')}
+                  />
+                  <CalendarDays
+                    aria-hidden="true"
+                    className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-ink-muted"
+                    strokeWidth={1.6}
+                  />
+                </div>
                 <p className="mt-2 text-[0.8125rem] text-ink-muted">
                   {t.onboarding.lastPeriodHint}
                 </p>

@@ -16,6 +16,7 @@ export default defineConfig({
         'icons/icon-maskable-512.png',
         'icons/icon-192.svg',
         'icons/icon-512.svg',
+        'images/hero-roselle.png',
       ],
       manifest: {
         name: 'Roselle Cycle Tracker',
@@ -25,7 +26,8 @@ export default defineConfig({
         background_color: '#fff8f8',
         display: 'standalone',
         orientation: 'portrait',
-        start_url: '/',
+        start_url: '/app',
+        scope: '/',
         icons: [
           {
             src: '/icons/icon-192.png',

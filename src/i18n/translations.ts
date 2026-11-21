@@ -38,6 +38,7 @@ export interface TranslationDict {
     welcomeTitle: string;
     welcomeBody: string;
     lastPeriodLabel: string;
+    lastPeriodPlaceholder: string;
     lastPeriodHint: string;
     periodLengthTitle: string;
     periodLengthBody: string;
@@ -45,6 +46,29 @@ export interface TranslationDict {
     cycleLengthBody: string;
     startTracking: string;
     skipForNow: string;
+  };
+  landing: {
+    openApp: string;
+    github: string;
+    headline: string;
+    subhead: string;
+    primaryCta: string;
+    secondaryCta: string;
+    previewTabToday: string;
+    previewTabCalendar: string;
+    previewCaption: string;
+    featuresTitle: string;
+    features: ReadonlyArray<{
+      index: '01' | '02' | '03';
+      title: string;
+      body: string;
+    }>;
+    legendTitle: string;
+    legendBody: string;
+    closingTitle: string;
+    closingBody: string;
+    closingCta: string;
+    footerLicense: string;
   };
   today: {
     cycleDay: (day: number) => string;
@@ -199,6 +223,7 @@ export const translations: Record<Locale, TranslationDict> = {
       welcomeTitle: 'เริ่มติดตามรอบเดือนของคุณ',
       welcomeBody: 'ข้อมูลทั้งหมดเก็บไว้บนเครื่องของคุณเท่านั้น ไม่ต้องสร้างบัญชี',
       lastPeriodLabel: 'วันแรกของประจำเดือนครั้งล่าสุด',
+      lastPeriodPlaceholder: 'เลือกวันที่ (ไม่บังคับ)',
       lastPeriodHint: 'เลือกวันที่เริ่มมา หรือกดข้ามเพื่อบันทึกภายหลังได้',
       periodLengthTitle: 'ประจำเดือนของคุณมักมากี่วัน',
       periodLengthBody: 'ค่ามาตรฐานคือ 5 วัน แอปจะปรับตามสถิติจริงเมื่อคุณบันทึกมากขึ้น',
@@ -206,6 +231,44 @@ export const translations: Record<Locale, TranslationDict> = {
       cycleLengthBody: 'นับจากวันแรกของรอบนี้ถึงวันแรกของรอบถัดไป (ค่ามาตรฐาน 28 วัน)',
       startTracking: 'เริ่มใช้งาน',
       skipForNow: 'ข้ามไปก่อน',
+    },
+    landing: {
+      openApp: 'เปิดแอป',
+      github: 'GitHub',
+      headline: 'ติดตามรอบเดือนและวันไข่ตกอย่างเป็นส่วนตัว บนเครื่องของคุณเอง',
+      subhead:
+        'บันทึกประจำเดือน อาการ และอารมณ์ในไม่กี่วินาที ไม่มีบัญชี ไม่มีโฆษณา และใช้งานออฟไลน์ได้เต็มรูปแบบ',
+      primaryCta: 'เริ่มใช้งานเลย',
+      secondaryCta: 'ดูซอร์สโค้ดบน GitHub',
+      previewTabToday: 'วันนี้',
+      previewTabCalendar: 'ปฏิทิน',
+      previewCaption: 'ตัวอย่างการใช้งานจริง ลองกดสลับดูได้',
+      featuresTitle: 'ออกแบบมาเพื่อการใช้งานทุกวันแบบไม่รบกวน',
+      features: [
+        {
+          index: '01',
+          title: 'เป็นส่วนตัว 100% บนเครื่องของคุณ',
+          body: 'บันทึกทั้งหมดเก็บด้วย IndexedDB บนอุปกรณ์โดยตรง ไม่ต้องสมัครสมาชิก ไม่ส่งข้อมูลขึ้นเซิร์ฟเวอร์ และส่งออกหรือนำเข้าไฟล์ JSON สำรองได้ทุกเมื่อ',
+        },
+        {
+          index: '02',
+          title: 'คาดการณ์รอบเดือนและจบรอบอัตโนมัติ',
+          body: 'คำนวณรอบถัดไป วันไข่ตก และช่วงเจริญพันธุ์จากประวัติจริง 6 รอบล่าสุด พร้อมจบรอบประจำเดือนอัตโนมัติตามค่าตั้งค่าเมื่อคุณลืมกดหยุด',
+        },
+        {
+          index: '03',
+          title: 'PWA ออฟไลน์และ Open Source',
+          body: 'ติดตั้งลงหน้าจอโฮมได้ทั้ง iOS และ Android ใช้งานได้แม้ไม่มีอินเทอร์เน็ต รองรับภาษาไทยและอังกฤษ พร้อมซอร์สโค้ดเปิดเผยภายใต้สัญญาอนุญาต MIT',
+        },
+      ],
+      legendTitle: 'อ่านปฏิทินได้ทันทีทั้งสีและรูปทรง',
+      legendBody:
+        'แต่ละระยะของรอบเดือนแยกด้วยทั้งเฉดสีและเส้นขอบ ไม่พึ่งพาสีเพียงอย่างเดียว',
+      closingTitle: 'เริ่มบันทึกได้ทันที ไม่ต้องสร้างบัญชี',
+      closingBody:
+        'ข้อมูลทุกวันอยู่บนอุปกรณ์ของคุณเท่านั้น และส่งออกสำรองเป็นไฟล์ JSON ได้ทุกเมื่อ',
+      closingCta: 'เปิด Roselle',
+      footerLicense: 'Open Source (MIT License)',
     },
     today: {
       cycleDay: (day) => `วันที่ ${day} ของรอบเดือน`,
@@ -397,6 +460,7 @@ export const translations: Record<Locale, TranslationDict> = {
       welcomeTitle: 'Track your cycle privately',
       welcomeBody: 'All records stay on your device with no account required.',
       lastPeriodLabel: 'First day of your last period',
+      lastPeriodPlaceholder: 'Select date (optional)',
       lastPeriodHint: 'Pick a start date or skip to log later.',
       periodLengthTitle: 'How long does your period usually last?',
       periodLengthBody: 'Typical length is 5 days. Predictions adapt as you log more cycles.',
@@ -404,6 +468,44 @@ export const translations: Record<Locale, TranslationDict> = {
       cycleLengthBody: 'Counted from day 1 of one period to day 1 of the next (default 28 days).',
       startTracking: 'Start tracking',
       skipForNow: 'Skip for now',
+    },
+    landing: {
+      openApp: 'Open app',
+      github: 'GitHub',
+      headline: 'Track your cycle and ovulation privately, strictly on your device',
+      subhead:
+        'Log periods, symptoms, and moods in seconds. No account, no ads, and full offline support as an installable PWA.',
+      primaryCta: 'Start tracking',
+      secondaryCta: 'View source on GitHub',
+      previewTabToday: 'Today',
+      previewTabCalendar: 'Calendar',
+      previewCaption: 'Interactive preview, tap to explore',
+      featuresTitle: 'Built for quiet daily check-ins',
+      features: [
+        {
+          index: '01',
+          title: 'Private and local-first on your device',
+          body: 'All logs stay in on-device IndexedDB storage with zero login walls, no tracking scripts, and full JSON backup export and restore.',
+        },
+        {
+          index: '02',
+          title: 'Adaptive predictions with smart auto-end',
+          body: 'Estimates upcoming cycles, ovulation, and fertile windows from your last 6 cycles, and wraps up active periods automatically if you forget to mark the end date.',
+        },
+        {
+          index: '03',
+          title: 'Installable offline PWA and open source',
+          body: 'Add to your iOS or Android home screen for standalone offline use, switch between Thai and English anytime, and inspect the MIT-licensed source.',
+        },
+      ],
+      legendTitle: 'Clear at a glance with color and shape',
+      legendBody:
+        'Every cycle phase pairs hue with distinct geometry so status never relies on color alone.',
+      closingTitle: 'Start logging now, no account needed',
+      closingBody:
+        'Every record stays strictly on your device with full JSON backup whenever you want.',
+      closingCta: 'Open Roselle',
+      footerLicense: 'Open Source (MIT License)',
     },
     today: {
       cycleDay: (day) => `Cycle Day ${day}`,

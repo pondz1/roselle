@@ -44,6 +44,23 @@
     -webkit-tap-highlight-color: transparent;
   }
 
+  input[type="date"] {
+    -webkit-appearance: none;
+    appearance: none;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    opacity: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 3rem;
+    height: 100%;
+    cursor: pointer;
+  }
+
   button:focus-visible,
   a:focus-visible,
   input:focus-visible,

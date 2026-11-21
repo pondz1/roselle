@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { AlertCircle } from 'lucide-react';
 import { AppShell } from './components/layout/AppShell';
 import { BottomNav, type TabId } from './components/layout/BottomNav';
@@ -8,6 +8,7 @@ import type { ISODate } from './domain/types';
 import { CalendarView } from './features/calendar/CalendarView';
 import { DailyLogSheet } from './features/daily-log/DailyLogSheet';
 import { InsightsView } from './features/insights/InsightsView';
+import { LandingPage } from './features/landing/LandingPage';
 import { OnboardingFlow } from './features/onboarding/OnboardingFlow';
 import { SettingsView } from './features/settings/SettingsView';
 import { TodayView } from './features/today/TodayView';
@@ -76,8 +77,15 @@ function AppContent() {
   );
 }
 
-function LocalizedShell() {
+interface LocalizedShellProps {
+  pathname: string;
+  onNavigate: (to: string) => void;
+}
+
+function LocalizedShell({ pathname, onNavigate }: LocalizedShellProps) {
   const { settings, updateSettings } = useCycle();
+  const isAppRoute = pathname.startsWith('/app');
+
   return (
     <I18nProvider
       locale={settings.locale}
@@ -85,7 +93,11 @@ function LocalizedShell() {
         void updateSettings({ locale });
       }}
     >
-      <AppContent />
+      {isAppRoute ? (
+        <AppContent />
+      ) : (
+        <LandingPage onOpenApp={() => onNavigate('/app')} />
+      )}
     </I18nProvider>
   );
 }
@@ -93,12 +105,33 @@ function LocalizedShell() {
 interface AppProps {
   repository?: CycleRepository;
   todayOverride?: ISODate;
+  initialPath?: string;
 }
 
-export function App({ repository, todayOverride }: AppProps) {
+export function App({ repository, todayOverride, initialPath }: AppProps) {
+  const [pathname, setPathname] = useState<string>(
+    () => initialPath ?? (typeof window !== 'undefined' ? window.location.pathname : '/app'),
+  );
+
+  useEffect(() => {
+    const handlePopState = () => {
+      setPathname(window.location.pathname);
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  const navigate = useCallback((to: string) => {
+    if (typeof window !== 'undefined' && window.location.pathname !== to) {
+      window.history.pushState({}, '', to);
+      window.scrollTo({ top: 0 });
+    }
+    setPathname(to);
+  }, []);
+
   return (
     <CycleProvider repository={repository} todayOverride={todayOverride}>
-      <LocalizedShell />
+      <LocalizedShell pathname={pathname} onNavigate={navigate} />
     </CycleProvider>
   );
 }

@@ -40,12 +40,12 @@ export function Button({
     <button
       type={type}
       className={[
-        'inline-flex items-center justify-center gap-2 font-medium shrink-0 whitespace-nowrap',
+        'inline-flex items-center justify-center gap-2 font-medium whitespace-nowrap',
         'transition-[background-color,color,transform,opacity] duration-[160ms] ease-[cubic-bezier(0.22,1,0.36,1)]',
         'disabled:opacity-45 disabled:pointer-events-none select-none',
         VARIANT_CLASSES[variant],
         SIZE_CLASSES[size],
-        fullWidth ? 'w-full' : '',
+        fullWidth ? 'w-full min-w-0' : 'shrink-0',
         className,
       ]
         .filter(Boolean)

@@ -97,25 +97,21 @@ export function MonthGrid({
             >
               <span
                 className={[
-                  'w-11 h-11 rounded-[12px] flex items-center justify-center transition-colors duration-[150ms]',
-                  isSelected ? 'bg-tinted-subtle' : '',
+                  'w-[42px] h-[42px] rounded-full flex items-center justify-center transition-colors duration-[150ms]',
+                  isSelected ? 'bg-tinted-subtle border-[1.5px] border-ink-primary/65' : '',
                 ]
                   .filter(Boolean)
                   .join(' ')}
               >
                 <span
                   className={[
-                    'relative w-9 h-9 rounded-full flex items-center justify-center text-[0.875rem] tabular-nums transition-colors duration-[160ms]',
+                    'relative w-8 h-8 rounded-full flex items-center justify-center text-[0.875rem] tabular-nums transition-colors duration-[160ms]',
                     circleClasses,
-                    isToday && phase !== 'logged-period'
-                      ? `ring-2 ring-ink-primary/40 ring-offset-1 ${
-                          isSelected ? 'ring-offset-tinted-subtle' : 'ring-offset-warm-surface'
-                        }`
+                    isToday && !isSelected && phase !== 'logged-period'
+                      ? 'ring-2 ring-ink-primary/40 ring-offset-1 ring-offset-warm-surface'
                       : '',
-                    isToday && phase === 'logged-period'
-                      ? `ring-2 ring-coral-rose ring-offset-2 ${
-                          isSelected ? 'ring-offset-tinted-subtle' : 'ring-offset-warm-surface'
-                        }`
+                    isToday && !isSelected && phase === 'logged-period'
+                      ? 'ring-2 ring-coral-rose ring-offset-2 ring-offset-warm-surface'
                       : '',
                   ]
                     .filter(Boolean)

@@ -38,13 +38,21 @@ npm run dev
 
 ## Deploying on Coolify
 
-This repository includes a multi-stage `Dockerfile` and `nginx.conf` tailored for PWA hosting on Coolify:
+This repository includes both a Coolify-ready `docker-compose.yaml` and a multi-stage `Dockerfile` with `nginx.conf` tailored for PWA hosting:
+
+### Option A: Docker Compose (Recommended)
+
+1. Create a new Application in Coolify connected to this GitHub repository.
+2. Select **Build Pack: Docker Compose** (`docker-compose.yaml` at the repo root is detected automatically).
+3. In the **roselle** service settings, enter your HTTPS domain (auto-mapped to port `80` via `SERVICE_FQDN_ROSELLE_80`).
+4. Deploy.
+
+### Option B: Dockerfile
 
 1. Create a new Application in Coolify connected to this GitHub repository.
 2. Select **Build Pack: Dockerfile**.
-3. Set **Port Exposes** to `80` (Nginx serves `/usr/share/nginx/html` with SPA fallback, immutable asset caching, `no-cache` headers for `sw.js` and `manifest.webmanifest`, and a `/health` endpoint).
-4. Enable HTTPS with your domain (required for Service Worker registration and PWA installation on mobile).
-5. Deploy.
+3. Set **Ports Exposes** to `80` and **Healthcheck Path** to `/health`.
+4. Enable HTTPS with your domain (required for Service Worker registration and PWA installation on mobile) and deploy.
 
 ## Privacy & Medical Disclaimer
 

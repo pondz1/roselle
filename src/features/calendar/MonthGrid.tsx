@@ -87,9 +87,8 @@ export function MonthGrid({
               aria-label={date}
               aria-pressed={isSelected}
               className={[
-                'relative flex flex-col items-center justify-center min-h-11 py-1 rounded-[12px]',
-                'transition-[transform,opacity,background-color] duration-[150ms] active:scale-[0.95]',
-                isSelected ? 'bg-tinted-subtle' : '',
+                'relative flex flex-col items-center justify-start min-h-11 py-0.5',
+                'transition-[transform,opacity] duration-[150ms] active:scale-[0.95]',
                 !inCurrentMonth ? 'opacity-35' : '',
                 disabled ? 'opacity-30 pointer-events-none' : '',
               ]
@@ -98,28 +97,41 @@ export function MonthGrid({
             >
               <span
                 className={[
-                  'relative w-9 h-9 rounded-full flex items-center justify-center text-[0.875rem] tabular-nums transition-colors duration-[160ms]',
-                  circleClasses,
-                  isToday && phase !== 'logged-period'
-                    ? 'ring-2 ring-ink-primary/40 ring-offset-1 ring-offset-warm-surface'
-                    : '',
-                  isToday && phase === 'logged-period'
-                    ? 'ring-2 ring-coral-rose ring-offset-2 ring-offset-warm-surface'
-                    : '',
+                  'w-11 h-11 rounded-[12px] flex items-center justify-center transition-colors duration-[150ms]',
+                  isSelected ? 'bg-tinted-subtle' : '',
                 ]
                   .filter(Boolean)
                   .join(' ')}
               >
-                {day}
-                {editMode && stagedPeriodDates.has(date) ? (
-                  <Check
-                    aria-hidden="true"
-                    className="w-2.5 h-2.5 absolute -top-0.5 -right-0.5 bg-warm-surface text-coral-rose rounded-full p-[1px]"
-                  />
-                ) : null}
+                <span
+                  className={[
+                    'relative w-9 h-9 rounded-full flex items-center justify-center text-[0.875rem] tabular-nums transition-colors duration-[160ms]',
+                    circleClasses,
+                    isToday && phase !== 'logged-period'
+                      ? `ring-2 ring-ink-primary/40 ring-offset-1 ${
+                          isSelected ? 'ring-offset-tinted-subtle' : 'ring-offset-warm-surface'
+                        }`
+                      : '',
+                    isToday && phase === 'logged-period'
+                      ? `ring-2 ring-coral-rose ring-offset-2 ${
+                          isSelected ? 'ring-offset-tinted-subtle' : 'ring-offset-warm-surface'
+                        }`
+                      : '',
+                  ]
+                    .filter(Boolean)
+                    .join(' ')}
+                >
+                  {day}
+                  {editMode && stagedPeriodDates.has(date) ? (
+                    <Check
+                      aria-hidden="true"
+                      className="w-2.5 h-2.5 absolute -top-0.5 -right-0.5 bg-warm-surface text-coral-rose rounded-full p-[1px]"
+                    />
+                  ) : null}
+                </span>
               </span>
 
-              <span className="h-1.5 mt-1 flex items-center justify-center gap-0.5">
+              <span className="h-1.5 mt-0.5 flex items-center justify-center gap-0.5">
                 {!editMode && info?.isOvulation ? (
                   <span aria-hidden="true" className="w-1.5 h-1.5 rounded-full bg-fertile-sage" />
                 ) : null}

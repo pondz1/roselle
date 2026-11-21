@@ -69,4 +69,34 @@ describe('TodayView', () => {
     expect(await screen.findByText('เลยกำหนด 4 วัน')).toBeInTheDocument();
     await db.delete();
   });
+
+  it('renders 360-degree cycle wheel day markers 1..28 with current cycle day active', async () => {
+    const db = new RoselleDatabase(`TodayWheel_${Math.random().toString(36).slice(2)}`);
+    const repo = new DexieCycleRepository(db);
+    await repo.updateSettings({ onboardingCompleted: true, defaultCycleLength: 28 });
+    await repo.upsertLog({
+      date: '2026-11-12',
+      flow: 'medium',
+      symptoms: [],
+      moods: [],
+      activities: [],
+      note: '',
+    });
+
+    const { container } = render(
+      <CycleProvider repository={repo} todayOverride="2026-11-22">
+        <Harness onOpenLog={() => {}} />
+      </CycleProvider>,
+    );
+
+    expect(await screen.findByText('ช่วงเจริญพันธุ์')).toBeInTheDocument();
+    const dayMarkers = container.querySelectorAll('[data-cycle-day]');
+    expect(dayMarkers).toHaveLength(28);
+    expect(container.querySelector('[data-cycle-day="1"]')).toBeInTheDocument();
+    expect(container.querySelector('[data-cycle-day="28"]')).toBeInTheDocument();
+    const activeMarker = container.querySelector('[data-active="true"]');
+    expect(activeMarker).toHaveAttribute('data-cycle-day', '11');
+
+    await db.delete();
+  });
 });

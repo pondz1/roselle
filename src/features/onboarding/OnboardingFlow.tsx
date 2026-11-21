@@ -49,18 +49,18 @@ export function OnboardingFlow() {
               aria-hidden="true"
               className="w-3 h-3 rounded-full bg-coral-rose inline-block"
             />
-            <span className="text-[0.9375rem] font-semibold tracking-tight text-ink-primary">
+            <span className="text-[0.9375rem] font-semibold text-ink-primary">
               {t.appName}
             </span>
           </div>
-          <div className="inline-flex rounded-full bg-tinted-subtle p-1" role="group" aria-label="Language">
+          <div className="inline-flex rounded-[10px] bg-tinted-subtle p-1" role="group" aria-label="Language">
             {(['th', 'en'] as const).map((lang) => (
               <button
                 key={lang}
                 type="button"
                 onClick={() => setLocale(lang)}
                 className={[
-                  'px-3 py-1 rounded-full text-[0.75rem] font-medium transition-colors duration-[160ms]',
+                  'px-3 py-1 rounded-[6px] text-[0.75rem] font-medium transition-colors duration-[150ms]',
                   locale === lang
                     ? 'bg-warm-surface text-coral-rose-ink'
                     : 'text-ink-muted hover:text-ink-primary',
@@ -72,35 +72,35 @@ export function OnboardingFlow() {
           </div>
         </header>
 
-        <div className="mt-7 flex items-center gap-2" aria-label={t.onboarding.stepOf(step, 3)}>
+        <div className="mt-8 flex items-center gap-2" aria-label={t.onboarding.stepOf(step, 3)}>
           {[1, 2, 3].map((idx) => (
             <div
               key={idx}
               className={[
-                'h-1.5 flex-1 rounded-full transition-colors duration-[200ms]',
+                'h-1 flex-1 rounded-full transition-colors duration-[200ms]',
                 idx <= step ? 'bg-coral-rose' : 'bg-tinted-subtle',
               ].join(' ')}
             />
           ))}
         </div>
-        <p className="mt-2.5 text-[0.8125rem] font-medium text-ink-muted tabular-nums">
+        <p className="mt-2 text-[0.8125rem] font-medium text-ink-muted tabular-nums">
           {t.onboarding.stepOf(step, 3)}
         </p>
 
         <div className="flex-1 flex flex-col justify-center py-8">
           {step === 1 ? (
             <div>
-              <div className="w-12 h-12 rounded-full bg-coral-rose-soft text-coral-rose-ink flex items-center justify-center mb-5">
-                <CalendarDays className="w-6 h-6" />
+              <div className="w-11 h-11 rounded-[12px] bg-coral-rose-soft text-coral-rose-ink flex items-center justify-center mb-5">
+                <CalendarDays className="w-5 h-5" strokeWidth={1.6} />
               </div>
-              <h1 className="text-[1.5rem] font-bold leading-snug text-ink-primary">
+              <h1 className="text-[1.5rem] font-semibold leading-snug text-ink-primary">
                 {t.onboarding.welcomeTitle}
               </h1>
               <p className="mt-2 text-[0.9375rem] leading-relaxed text-ink-secondary">
                 {t.onboarding.welcomeBody}
               </p>
 
-              <div className="mt-7">
+              <div className="mt-8">
                 <label
                   htmlFor="onboarding-last-period"
                   className="block text-[0.875rem] font-medium text-ink-primary mb-2"
@@ -114,7 +114,7 @@ export function OnboardingFlow() {
                   value={lastPeriodStart}
                   onChange={(e) => setLastPeriodStart(e.target.value)}
                   onInput={(e) => setLastPeriodStart(e.currentTarget.value)}
-                  className="w-full min-h-12 rounded-[14px] bg-tinted-subtle border border-rose-hairline px-4 py-3 text-[0.9375rem] text-ink-primary tabular-nums focus:bg-warm-surface"
+                  className="w-full min-h-12 rounded-[10px] bg-tinted-subtle border border-rose-hairline px-4 py-3 text-[0.9375rem] text-ink-primary tabular-nums focus:bg-warm-surface"
                 />
                 <p className="mt-2 text-[0.8125rem] text-ink-muted">
                   {t.onboarding.lastPeriodHint}
@@ -125,10 +125,10 @@ export function OnboardingFlow() {
 
           {step === 2 ? (
             <div>
-              <div className="w-12 h-12 rounded-full bg-coral-rose-soft text-coral-rose-ink flex items-center justify-center mb-5">
-                <Droplets className="w-6 h-6" />
+              <div className="w-11 h-11 rounded-[12px] bg-coral-rose-soft text-coral-rose-ink flex items-center justify-center mb-5">
+                <Droplets className="w-5 h-5" strokeWidth={1.6} />
               </div>
-              <h1 className="text-[1.5rem] font-bold leading-snug text-ink-primary">
+              <h1 className="text-[1.5rem] font-semibold leading-snug text-ink-primary">
                 {t.onboarding.periodLengthTitle}
               </h1>
               <p className="mt-2 text-[0.9375rem] leading-relaxed text-ink-secondary">
@@ -141,22 +141,22 @@ export function OnboardingFlow() {
                   aria-label="-"
                   disabled={periodLength <= 2}
                   onClick={() => setPeriodLength((v) => Math.max(2, v - 1))}
-                  className="w-12 h-12 rounded-full bg-tinted-subtle text-ink-primary text-[1.25rem] font-semibold hover:bg-coral-rose-soft hover:text-coral-rose-ink disabled:opacity-40 transition-colors"
+                  className="w-12 h-12 rounded-[12px] bg-tinted-subtle text-ink-primary text-[1.25rem] font-medium hover:bg-coral-rose-soft hover:text-coral-rose-ink disabled:opacity-40 transition-colors"
                 >
                   -
                 </button>
-                <div className="min-w-[110px] text-center">
-                  <div className="text-[2.25rem] font-bold text-ink-primary tabular-nums leading-none">
+                <div className="min-w-[108px] text-center">
+                  <div className="text-[2.25rem] font-medium text-ink-primary tabular-nums leading-none">
                     {periodLength}
                   </div>
-                  <div className="mt-1 text-[0.8125rem] text-ink-muted">{t.common.dayShort}</div>
+                  <div className="mt-2 text-[0.8125rem] text-ink-muted">{t.common.dayShort}</div>
                 </div>
                 <button
                   type="button"
                   aria-label="+"
                   disabled={periodLength >= 10}
                   onClick={() => setPeriodLength((v) => Math.min(10, v + 1))}
-                  className="w-12 h-12 rounded-full bg-tinted-subtle text-ink-primary text-[1.25rem] font-semibold hover:bg-coral-rose-soft hover:text-coral-rose-ink disabled:opacity-40 transition-colors"
+                  className="w-12 h-12 rounded-[12px] bg-tinted-subtle text-ink-primary text-[1.25rem] font-medium hover:bg-coral-rose-soft hover:text-coral-rose-ink disabled:opacity-40 transition-colors"
                 >
                   +
                 </button>
@@ -166,10 +166,10 @@ export function OnboardingFlow() {
 
           {step === 3 ? (
             <div>
-              <div className="w-12 h-12 rounded-full bg-fertile-sage-soft text-fertile-sage-ink flex items-center justify-center mb-5">
-                <Repeat className="w-6 h-6" />
+              <div className="w-11 h-11 rounded-[12px] bg-fertile-sage-soft text-fertile-sage-ink flex items-center justify-center mb-5">
+                <Repeat className="w-5 h-5" strokeWidth={1.6} />
               </div>
-              <h1 className="text-[1.5rem] font-bold leading-snug text-ink-primary">
+              <h1 className="text-[1.5rem] font-semibold leading-snug text-ink-primary">
                 {t.onboarding.cycleLengthTitle}
               </h1>
               <p className="mt-2 text-[0.9375rem] leading-relaxed text-ink-secondary">
@@ -182,22 +182,22 @@ export function OnboardingFlow() {
                   aria-label="-"
                   disabled={cycleLength <= 18}
                   onClick={() => setCycleLength((v) => Math.max(18, v - 1))}
-                  className="w-12 h-12 rounded-full bg-tinted-subtle text-ink-primary text-[1.25rem] font-semibold hover:bg-coral-rose-soft hover:text-coral-rose-ink disabled:opacity-40 transition-colors"
+                  className="w-12 h-12 rounded-[12px] bg-tinted-subtle text-ink-primary text-[1.25rem] font-medium hover:bg-coral-rose-soft hover:text-coral-rose-ink disabled:opacity-40 transition-colors"
                 >
                   -
                 </button>
-                <div className="min-w-[110px] text-center">
-                  <div className="text-[2.25rem] font-bold text-ink-primary tabular-nums leading-none">
+                <div className="min-w-[108px] text-center">
+                  <div className="text-[2.25rem] font-medium text-ink-primary tabular-nums leading-none">
                     {cycleLength}
                   </div>
-                  <div className="mt-1 text-[0.8125rem] text-ink-muted">{t.common.dayShort}</div>
+                  <div className="mt-2 text-[0.8125rem] text-ink-muted">{t.common.dayShort}</div>
                 </div>
                 <button
                   type="button"
                   aria-label="+"
                   disabled={cycleLength >= 45}
                   onClick={() => setCycleLength((v) => Math.min(45, v + 1))}
-                  className="w-12 h-12 rounded-full bg-tinted-subtle text-ink-primary text-[1.25rem] font-semibold hover:bg-coral-rose-soft hover:text-coral-rose-ink disabled:opacity-40 transition-colors"
+                  className="w-12 h-12 rounded-[12px] bg-tinted-subtle text-ink-primary text-[1.25rem] font-medium hover:bg-coral-rose-soft hover:text-coral-rose-ink disabled:opacity-40 transition-colors"
                 >
                   +
                 </button>

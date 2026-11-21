@@ -26,13 +26,13 @@ export function TodayView({ onOpenLog }: TodayViewProps) {
           <p className="text-[0.8125rem] font-medium text-ink-secondary tabular-nums">
             {formatFullDate(today, locale)}
           </p>
-          <h1 className="text-[1.375rem] font-semibold tracking-tight text-ink-primary">
+          <h1 className="text-[1.375rem] font-semibold text-ink-primary">
             {t.appName}
           </h1>
         </div>
 
         <div
-          className="inline-flex rounded-full bg-tinted-subtle p-1"
+          className="inline-flex rounded-[10px] bg-tinted-subtle p-1"
           role="group"
           aria-label={t.settings.languageTitle}
         >
@@ -42,7 +42,7 @@ export function TodayView({ onOpenLog }: TodayViewProps) {
               type="button"
               onClick={() => setLocale(lang)}
               className={[
-                'px-2.5 py-1 rounded-full text-[0.75rem] font-medium transition-colors duration-[160ms]',
+                'px-3 py-1 rounded-[6px] text-[0.75rem] font-medium transition-colors duration-[150ms]',
                 locale === lang
                   ? 'bg-warm-surface text-coral-rose-ink'
                   : 'text-ink-muted hover:text-ink-primary',
@@ -57,12 +57,12 @@ export function TodayView({ onOpenLog }: TodayViewProps) {
       {summary.status === 'no_data' ? (
         <div className="py-6">
           <EmptyState
-            icon={<Droplets className="w-6 h-6" />}
+            icon={<Droplets className="w-5 h-5" strokeWidth={1.6} />}
             title={t.today.emptyTitle}
             body={t.today.emptyBody}
             action={
               <Button size="lg" onClick={() => void toggleTodayPeriod()}>
-                <Droplets className="w-4 h-4" />
+                <Droplets className="w-4 h-4" strokeWidth={1.6} />
                 <span>{t.today.logPeriodToday}</span>
               </Button>
             }
@@ -76,7 +76,7 @@ export function TodayView({ onOpenLog }: TodayViewProps) {
             {isTodayLoggedPeriod ? (
               <>
                 <Button fullWidth size="lg" onClick={() => onOpenLog(today)}>
-                  <PenLine className="w-4 h-4" />
+                  <PenLine className="w-4 h-4" strokeWidth={1.6} />
                   <span>{t.today.editTodayLog}</span>
                 </Button>
                 <Button
@@ -90,22 +90,22 @@ export function TodayView({ onOpenLog }: TodayViewProps) {
               </>
             ) : (
               <Button fullWidth size="lg" onClick={() => void toggleTodayPeriod()}>
-                <Droplets className="w-4 h-4" />
+                <Droplets className="w-4 h-4" strokeWidth={1.6} />
                 <span>{t.today.logPeriodToday}</span>
               </Button>
             )}
           </div>
 
-          <div className="mt-6 w-full grid grid-cols-2 divide-x divide-rose-hairline border-y border-rose-hairline py-3.5">
+          <div className="mt-6 w-full grid grid-cols-2 divide-x divide-rose-hairline border-y border-rose-hairline py-4">
             <div className="pr-3">
               <p className="text-[0.75rem] text-ink-muted">{t.today.nextPeriodLabel}</p>
-              <p className="mt-0.5 text-[0.9375rem] font-semibold text-ink-primary tabular-nums">
+              <p className="mt-1 text-[0.9375rem] font-semibold text-ink-primary tabular-nums">
                 {summary.nextPeriodStart ? formatShortDate(summary.nextPeriodStart, locale) : '-'}
               </p>
             </div>
             <div className="pl-4">
               <p className="text-[0.75rem] text-ink-muted">{t.today.ovulationDateLabel}</p>
-              <p className="mt-0.5 text-[0.9375rem] font-semibold text-fertile-sage-ink tabular-nums">
+              <p className="mt-1 text-[0.9375rem] font-semibold text-fertile-sage-ink tabular-nums">
                 {summary.ovulationDate ? formatShortDate(summary.ovulationDate, locale) : '-'}
               </p>
             </div>

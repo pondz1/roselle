@@ -14,19 +14,19 @@ interface StepperRowProps {
 
 function StepperRow({ label, value, min, max, unit, onChange }: StepperRowProps) {
   return (
-    <div className="py-3.5 flex items-center justify-between gap-3">
+    <div className="py-3 flex items-center justify-between gap-3">
       <span className="text-[0.9375rem] text-ink-primary">{label}</span>
-      <div className="flex items-center gap-2.5">
+      <div className="flex items-center gap-2">
         <button
           type="button"
           aria-label={`Decrease ${label}`}
           disabled={value <= min}
           onClick={() => onChange(Math.max(min, value - 1))}
-          className="w-9 h-9 rounded-full bg-tinted-subtle text-ink-primary font-semibold hover:bg-coral-rose-soft hover:text-coral-rose-ink disabled:opacity-40 transition-colors"
+          className="w-10 h-10 rounded-[10px] bg-tinted-subtle text-ink-primary font-medium hover:bg-coral-rose-soft hover:text-coral-rose-ink disabled:opacity-40 transition-colors"
         >
           -
         </button>
-        <span className="min-w-[64px] text-center text-[0.9375rem] font-semibold text-ink-primary tabular-nums">
+        <span className="min-w-[64px] text-center text-[0.9375rem] font-medium text-ink-primary tabular-nums">
           {value} {unit}
         </span>
         <button
@@ -34,7 +34,7 @@ function StepperRow({ label, value, min, max, unit, onChange }: StepperRowProps)
           aria-label={`Increase ${label}`}
           disabled={value >= max}
           onClick={() => onChange(Math.min(max, value + 1))}
-          className="w-9 h-9 rounded-full bg-tinted-subtle text-ink-primary font-semibold hover:bg-coral-rose-soft hover:text-coral-rose-ink disabled:opacity-40 transition-colors"
+          className="w-10 h-10 rounded-[10px] bg-tinted-subtle text-ink-primary font-medium hover:bg-coral-rose-soft hover:text-coral-rose-ink disabled:opacity-40 transition-colors"
         >
           +
         </button>
@@ -50,13 +50,13 @@ export function SettingsView() {
   return (
     <div className="flex flex-col pb-8">
       <header className="px-5 pt-6 pb-4">
-        <h1 className="text-[1.375rem] font-semibold tracking-tight text-ink-primary">
+        <h1 className="text-[1.375rem] font-semibold text-ink-primary">
           {t.settings.title}
         </h1>
       </header>
 
       <section className="px-5 pb-4">
-        <h2 className="text-[0.8125rem] font-semibold uppercase tracking-wide text-ink-secondary mb-1">
+        <h2 className="text-[0.875rem] font-medium text-ink-secondary mb-2">
           {t.settings.cycleDefaultsTitle}
         </h2>
         <div className="divide-y divide-rose-hairline border-t border-rose-hairline">
@@ -92,7 +92,7 @@ export function SettingsView() {
           <h2 className="text-[0.9375rem] font-semibold text-ink-primary">
             {t.settings.languageTitle}
           </h2>
-          <div className="inline-flex rounded-full bg-tinted-subtle p-1" role="group">
+          <div className="inline-flex rounded-[10px] bg-tinted-subtle p-1" role="group">
             {(
               [
                 { id: 'th', label: t.settings.languageTh },
@@ -104,7 +104,7 @@ export function SettingsView() {
                 type="button"
                 onClick={() => setLocale(opt.id)}
                 className={[
-                  'px-4 py-1.5 rounded-full text-[0.8125rem] font-medium transition-colors duration-[160ms]',
+                  'px-4 py-1.5 rounded-[6px] text-[0.8125rem] font-medium transition-colors duration-[150ms]',
                   locale === opt.id
                     ? 'bg-warm-surface text-coral-rose-ink'
                     : 'text-ink-muted hover:text-ink-primary',
@@ -119,9 +119,9 @@ export function SettingsView() {
 
       <BackupControls />
 
-      <footer className="px-5 pt-5 border-t border-rose-hairline space-y-2.5">
+      <footer className="px-5 pt-5 border-t border-rose-hairline space-y-3">
         <div className="flex items-start gap-2.5 text-[0.8125rem] leading-relaxed text-ink-secondary">
-          <ShieldCheck className="w-4 h-4 shrink-0 mt-0.5 text-fertile-sage" />
+          <ShieldCheck className="w-4 h-4 shrink-0 mt-0.5 text-fertile-sage" strokeWidth={1.6} />
           <p>{t.settings.privacyNote}</p>
         </div>
         <p className="text-[0.75rem] leading-relaxed text-ink-muted">{t.insights.disclaimer}</p>

@@ -29,7 +29,7 @@ function AppContent() {
           <div className="flex justify-center py-4">
             <Skeleton className="w-[248px] h-[248px] rounded-full" />
           </div>
-          <Skeleton className="h-12 w-full rounded-full" />
+          <Skeleton className="h-12 w-full rounded-[12px]" />
           <Skeleton className="h-24 w-full" />
         </div>
       </AppShell>
@@ -40,8 +40,8 @@ function AppContent() {
     return (
       <AppShell>
         <div className="px-6 py-12 flex flex-col items-center text-center">
-          <div className="w-12 h-12 rounded-full bg-danger-soft text-danger-ink flex items-center justify-center mb-4">
-            <AlertCircle className="w-6 h-6" />
+          <div className="w-12 h-12 rounded-[12px] bg-danger-soft text-danger-ink flex items-center justify-center mb-4">
+            <AlertCircle className="w-5 h-5" strokeWidth={1.6} />
           </div>
           <h1 className="text-[1.125rem] font-semibold text-ink-primary">
             {t.common.storageErrorTitle}

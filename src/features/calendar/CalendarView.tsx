@@ -88,12 +88,12 @@ export function CalendarView({ onSelectDate }: CalendarViewProps) {
   return (
     <div className="flex flex-col pb-6">
       <header className="px-5 pt-6 pb-4 flex items-center justify-between gap-2">
-        <h1 className="text-[1.375rem] font-semibold tracking-tight text-ink-primary">
+        <h1 className="text-[1.375rem] font-semibold text-ink-primary">
           {t.calendar.title}
         </h1>
         {!editMode ? (
           <Button variant="secondary" size="sm" onClick={enterEditMode}>
-            <CalendarPlus className="w-4 h-4" />
+            <CalendarPlus className="w-4 h-4" strokeWidth={1.6} />
             <span>{t.calendar.editPeriodDays}</span>
           </Button>
         ) : null}
@@ -121,7 +121,7 @@ export function CalendarView({ onSelectDate }: CalendarViewProps) {
                 setCursor({ year: initial.year, month: initial.month });
                 setSelectedDate(today);
               }}
-              className="mr-1 px-3 py-1.5 rounded-full text-[0.75rem] font-medium bg-tinted-subtle text-ink-primary hover:bg-coral-rose-soft hover:text-coral-rose-ink transition-colors"
+              className="mr-1 px-3 py-1.5 rounded-[8px] text-[0.75rem] font-medium bg-tinted-subtle text-ink-primary hover:bg-coral-rose-soft hover:text-coral-rose-ink transition-colors"
             >
               {t.calendar.jumpToday}
             </button>
@@ -130,17 +130,17 @@ export function CalendarView({ onSelectDate }: CalendarViewProps) {
             type="button"
             aria-label={t.calendar.prevMonth}
             onClick={() => setCursor((c) => addMonths(c.year, c.month, -1))}
-            className="w-10 h-10 rounded-full inline-flex items-center justify-center text-ink-secondary hover:bg-tinted-subtle hover:text-ink-primary transition-colors"
+            className="w-10 h-10 rounded-[10px] inline-flex items-center justify-center text-ink-secondary hover:bg-tinted-subtle hover:text-ink-primary transition-colors"
           >
-            <ChevronLeft className="w-5 h-5" />
+            <ChevronLeft className="w-[18px] h-[18px]" strokeWidth={1.6} />
           </button>
           <button
             type="button"
             aria-label={t.calendar.nextMonth}
             onClick={() => setCursor((c) => addMonths(c.year, c.month, 1))}
-            className="w-10 h-10 rounded-full inline-flex items-center justify-center text-ink-secondary hover:bg-tinted-subtle hover:text-ink-primary transition-colors"
+            className="w-10 h-10 rounded-[10px] inline-flex items-center justify-center text-ink-secondary hover:bg-tinted-subtle hover:text-ink-primary transition-colors"
           >
-            <ChevronRight className="w-5 h-5" />
+            <ChevronRight className="w-[18px] h-[18px]" strokeWidth={1.6} />
           </button>
         </div>
       </div>

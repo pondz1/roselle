@@ -111,7 +111,7 @@ export function DailyLogSheet({ date, open, onClose }: DailyLogSheetProps) {
       {isFuture ? (
         <div className="py-4 space-y-3">
           {dayInfo ? (
-            <div className="rounded-[14px] bg-tinted-subtle px-4 py-3 text-[0.875rem] text-ink-primary flex items-center justify-between">
+            <div className="rounded-[12px] bg-tinted-subtle px-4 py-3 text-[0.875rem] text-ink-primary flex items-center justify-between">
               <span className="text-ink-secondary">{t.today.conceptionChanceLabel}</span>
               <span className="font-semibold text-fertile-sage-ink">
                 {t.today.conceptionChance[dayInfo.conceptionChance]}
@@ -126,7 +126,7 @@ export function DailyLogSheet({ date, open, onClose }: DailyLogSheetProps) {
       ) : (
         <div className="space-y-6 pb-2">
           <section>
-            <h3 className="text-[0.8125rem] font-semibold uppercase tracking-wide text-ink-secondary mb-2.5">
+            <h3 className="text-[0.875rem] font-medium text-ink-secondary mb-3">
               {t.dailyLog.flowSection}
             </h3>
             <div className="flex flex-wrap gap-2">
@@ -143,7 +143,7 @@ export function DailyLogSheet({ date, open, onClose }: DailyLogSheetProps) {
           </section>
 
           <section className="pt-5 border-t border-rose-hairline">
-            <h3 className="text-[0.8125rem] font-semibold uppercase tracking-wide text-ink-secondary mb-2.5">
+            <h3 className="text-[0.875rem] font-medium text-ink-secondary mb-3">
               {t.dailyLog.symptomsSection}
             </h3>
             <div className="flex flex-wrap gap-2">
@@ -160,7 +160,7 @@ export function DailyLogSheet({ date, open, onClose }: DailyLogSheetProps) {
           </section>
 
           <section className="pt-5 border-t border-rose-hairline">
-            <h3 className="text-[0.8125rem] font-semibold uppercase tracking-wide text-ink-secondary mb-2.5">
+            <h3 className="text-[0.875rem] font-medium text-ink-secondary mb-3">
               {t.dailyLog.moodsSection}
             </h3>
             <div className="flex flex-wrap gap-2">
@@ -177,7 +177,7 @@ export function DailyLogSheet({ date, open, onClose }: DailyLogSheetProps) {
           </section>
 
           <section className="pt-5 border-t border-rose-hairline">
-            <h3 className="text-[0.8125rem] font-semibold uppercase tracking-wide text-ink-secondary mb-2.5">
+            <h3 className="text-[0.875rem] font-medium text-ink-secondary mb-3">
               {t.dailyLog.activitiesSection}
             </h3>
             <div className="flex flex-wrap gap-2">
@@ -198,7 +198,7 @@ export function DailyLogSheet({ date, open, onClose }: DailyLogSheetProps) {
             <div className="flex items-center justify-between mb-2">
               <label
                 htmlFor="daily-log-note"
-                className="text-[0.8125rem] font-semibold uppercase tracking-wide text-ink-secondary"
+                className="text-[0.875rem] font-medium text-ink-secondary"
               >
                 {t.dailyLog.noteSection}
               </label>
@@ -211,7 +211,7 @@ export function DailyLogSheet({ date, open, onClose }: DailyLogSheetProps) {
               value={note}
               onChange={(e) => setNote(e.target.value)}
               placeholder={t.dailyLog.notePlaceholder}
-              className="w-full rounded-[14px] bg-tinted-subtle border border-rose-hairline px-3.5 py-2.5 text-[0.9375rem] text-ink-primary placeholder:text-ink-muted focus:bg-warm-surface resize-none"
+              className="w-full rounded-[10px] bg-tinted-subtle border border-rose-hairline px-4 py-3 text-[0.9375rem] text-ink-primary placeholder:text-ink-muted focus:bg-warm-surface resize-none"
             />
           </section>
         </div>

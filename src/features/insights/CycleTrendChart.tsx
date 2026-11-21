@@ -55,13 +55,21 @@ export function CycleTrendChart({ history, averageCycleLength }: CycleTrendChart
         ) : null}
       </div>
 
-      <div className="rounded-[16px] bg-tinted-subtle/65 px-3 pt-3 pb-2">
+      <div className="rounded-[12px] bg-tinted-subtle/65 px-3 pt-4 pb-2">
         <svg
           viewBox={`0 0 ${chartWidth} ${chartHeight}`}
           className="w-full h-auto overflow-visible"
           role="img"
           aria-label={t.insights.trendTitle}
         >
+          <line
+            x1={4}
+            x2={chartWidth - 4}
+            y1={topPad + usableHeight}
+            y2={topPad + usableHeight}
+            stroke="var(--color-rose-hairline)"
+            strokeWidth={1}
+          />
           {avgY !== null ? (
             <line
               x1={4}
@@ -69,9 +77,9 @@ export function CycleTrendChart({ history, averageCycleLength }: CycleTrendChart
               y1={avgY}
               y2={avgY}
               stroke="var(--color-coral-rose)"
-              strokeOpacity={0.45}
+              strokeOpacity={0.4}
               strokeDasharray="4 4"
-              strokeWidth={1.25}
+              strokeWidth={1}
             />
           ) : null}
 
@@ -81,6 +89,7 @@ export function CycleTrendChart({ history, averageCycleLength }: CycleTrendChart
             const x = idx * slotWidth + (slotWidth - barWidth) / 2;
             const y = topPad + (usableHeight - barH);
             const centerX = x + barWidth / 2;
+            const isLatest = idx === completed.length - 1;
 
             return (
               <g key={item.startDate}>
@@ -88,9 +97,9 @@ export function CycleTrendChart({ history, averageCycleLength }: CycleTrendChart
                   x={centerX}
                   y={y - 6}
                   textAnchor="middle"
-                  fill="var(--color-ink-primary)"
+                  fill={isLatest ? 'var(--color-coral-rose-ink)' : 'var(--color-ink-secondary)'}
                   fontSize="11"
-                  fontWeight="600"
+                  fontWeight={isLatest ? '600' : '500'}
                   className="tabular-nums"
                 >
                   {len}
@@ -100,14 +109,14 @@ export function CycleTrendChart({ history, averageCycleLength }: CycleTrendChart
                   y={y}
                   width={barWidth}
                   height={barH}
-                  rx={8}
-                  fill="var(--color-coral-rose)"
+                  rx={4}
+                  fill={isLatest ? 'var(--color-coral-rose)' : 'var(--color-chart-muted)'}
                 />
                 <text
                   x={centerX}
                   y={chartHeight - 6}
                   textAnchor="middle"
-                  fill="var(--color-ink-muted)"
+                  fill={isLatest ? 'var(--color-ink-primary)' : 'var(--color-ink-muted)'}
                   fontSize="10"
                   className="tabular-nums"
                 >

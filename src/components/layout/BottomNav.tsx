@@ -41,10 +41,10 @@ export function BottomNav({ activeTab, onSelectTab }: BottomNavProps) {
               {isActive ? (
                 <span
                   aria-hidden="true"
-                  className="absolute top-0 h-[2.5px] w-8 rounded-full bg-coral-rose"
+                  className="absolute top-0 h-0.5 w-8 rounded-full bg-coral-rose"
                 />
               ) : null}
-              <Icon className="w-5 h-5" strokeWidth={isActive ? 2.2 : 1.8} />
+              <Icon className="w-[18px] h-[18px]" strokeWidth={1.6} />
               <span className="text-[0.75rem] font-medium leading-none">{label}</span>
             </button>
           );

@@ -86,7 +86,7 @@ export function BackupControls() {
 
         <div className="mt-4 flex gap-3">
           <Button variant="secondary" fullWidth onClick={() => void handleExport()}>
-            <Download className="w-4 h-4" />
+            <Download className="w-4 h-4" strokeWidth={1.6} />
             <span>{t.settings.exportButton}</span>
           </Button>
           <Button
@@ -94,7 +94,7 @@ export function BackupControls() {
             fullWidth
             onClick={() => fileInputRef.current?.click()}
           >
-            <Upload className="w-4 h-4" />
+            <Upload className="w-4 h-4" strokeWidth={1.6} />
             <span>{t.settings.importButton}</span>
           </Button>
           <input
@@ -127,7 +127,7 @@ export function BackupControls() {
           {t.settings.dangerTitle}
         </h2>
         <Button variant="danger" fullWidth onClick={() => setResetSheetOpen(true)}>
-          <Trash2 className="w-4 h-4" />
+          <Trash2 className="w-4 h-4" strokeWidth={1.6} />
           <span>{t.settings.resetButton}</span>
         </Button>
       </section>

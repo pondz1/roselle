@@ -97,7 +97,7 @@ export function SelectedDayPanel({ date, onOpenDetails }: SelectedDayPanelProps)
         </div>
         {phaseLabel ? (
           <span
-            className={`shrink-0 rounded-full px-3 py-1 text-[0.75rem] font-medium ${phaseClass}`}
+            className={`shrink-0 rounded-[8px] px-2.5 py-1 text-[0.75rem] font-medium ${phaseClass}`}
           >
             {phaseLabel}
           </span>
@@ -105,9 +105,9 @@ export function SelectedDayPanel({ date, onOpenDetails }: SelectedDayPanelProps)
       </div>
 
       {isFuture ? (
-        <div className="space-y-2.5">
+        <div className="space-y-3">
           {info ? (
-            <div className="rounded-[14px] bg-tinted-subtle px-4 py-3 text-[0.875rem] flex items-center justify-between">
+            <div className="rounded-[12px] bg-tinted-subtle px-4 py-3 text-[0.875rem] flex items-center justify-between">
               <span className="text-ink-secondary">{t.today.conceptionChanceLabel}</span>
               <span className="font-semibold text-fertile-sage-ink">
                 {t.today.conceptionChance[info.conceptionChance]}
@@ -120,23 +120,23 @@ export function SelectedDayPanel({ date, onOpenDetails }: SelectedDayPanelProps)
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-2 gap-2.5">
+          <div className="grid grid-cols-2 gap-3">
             <button
               type="button"
               aria-pressed={isEpisodeStart}
               onClick={() => void handleToggleStart()}
               className={[
-                'flex items-center justify-center gap-1.5 min-h-11 px-3 py-2.5 rounded-[14px]',
-                'text-[0.8125rem] font-medium border-[1.5px] transition-[background-color,color,border-color,transform] duration-[160ms] active:scale-[0.98]',
+                'flex items-center justify-center gap-2 min-h-11 px-3 py-2 rounded-[10px]',
+                'text-[0.8125rem] font-medium border-[1.5px] transition-[background-color,color,border-color,transform] duration-[150ms] active:scale-[0.98]',
                 isEpisodeStart
                   ? 'bg-coral-rose text-warm-surface border-coral-rose'
                   : 'bg-coral-rose-soft/80 text-coral-rose-ink border-transparent hover:bg-coral-rose-soft',
               ].join(' ')}
             >
               {isEpisodeStart ? (
-                <Check className="w-4 h-4 shrink-0" />
+                <Check className="w-4 h-4 shrink-0" strokeWidth={1.6} />
               ) : (
-                <Droplets className="w-4 h-4 shrink-0" />
+                <Droplets className="w-4 h-4 shrink-0" strokeWidth={1.6} />
               )}
               <span className="truncate">
                 {isEpisodeStart
@@ -151,8 +151,8 @@ export function SelectedDayPanel({ date, onOpenDetails }: SelectedDayPanelProps)
               disabled={!canMarkEnd}
               onClick={() => void handleToggleEnd()}
               className={[
-                'flex items-center justify-center gap-1.5 min-h-11 px-3 py-2.5 rounded-[14px]',
-                'text-[0.8125rem] font-medium border-[1.5px] transition-[background-color,color,border-color,transform] duration-[160ms] active:scale-[0.98]',
+                'flex items-center justify-center gap-2 min-h-11 px-3 py-2 rounded-[10px]',
+                'text-[0.8125rem] font-medium border-[1.5px] transition-[background-color,color,border-color,transform] duration-[150ms] active:scale-[0.98]',
                 'disabled:opacity-40 disabled:pointer-events-none',
                 isMarkedEnded
                   ? 'bg-coral-rose text-warm-surface border-coral-rose'
@@ -160,9 +160,9 @@ export function SelectedDayPanel({ date, onOpenDetails }: SelectedDayPanelProps)
               ].join(' ')}
             >
               {isMarkedEnded ? (
-                <Check className="w-4 h-4 shrink-0" />
+                <Check className="w-4 h-4 shrink-0" strokeWidth={1.6} />
               ) : (
-                <SquareCheck className="w-4 h-4 shrink-0" />
+                <SquareCheck className="w-4 h-4 shrink-0" strokeWidth={1.6} />
               )}
               <span className="truncate">
                 {isMarkedEnded
@@ -179,17 +179,17 @@ export function SelectedDayPanel({ date, onOpenDetails }: SelectedDayPanelProps)
           ) : null}
 
           {hasDetailTags ? (
-            <div className="space-y-2.5 pt-1">
-              <div className="flex flex-wrap gap-1.5">
+            <div className="space-y-3 pt-1">
+              <div className="flex flex-wrap gap-2">
                 {log!.flow !== 'none' ? (
-                  <span className="inline-flex items-center rounded-full bg-coral-rose-soft text-coral-rose-ink px-3 py-1 text-[0.75rem] font-medium">
+                  <span className="inline-flex items-center rounded-[8px] bg-coral-rose-soft text-coral-rose-ink px-2.5 py-1 text-[0.75rem] font-medium">
                     {t.dailyLog.flow[log!.flow]}
                   </span>
                 ) : null}
                 {log!.symptoms.map((s) => (
                   <span
                     key={s}
-                    className="inline-flex items-center rounded-full bg-tinted-subtle text-ink-primary px-3 py-1 text-[0.75rem]"
+                    className="inline-flex items-center rounded-[8px] bg-tinted-subtle text-ink-primary px-2.5 py-1 text-[0.75rem]"
                   >
                     {t.dailyLog.symptoms[s]}
                   </span>
@@ -197,7 +197,7 @@ export function SelectedDayPanel({ date, onOpenDetails }: SelectedDayPanelProps)
                 {log!.moods.map((m) => (
                   <span
                     key={m}
-                    className="inline-flex items-center rounded-full bg-tinted-subtle text-ink-primary px-3 py-1 text-[0.75rem]"
+                    className="inline-flex items-center rounded-[8px] bg-tinted-subtle text-ink-primary px-2.5 py-1 text-[0.75rem]"
                   >
                     {t.dailyLog.moods[m]}
                   </span>
@@ -205,14 +205,14 @@ export function SelectedDayPanel({ date, onOpenDetails }: SelectedDayPanelProps)
                 {log!.activities.map((a) => (
                   <span
                     key={a}
-                    className="inline-flex items-center rounded-full bg-fertile-sage-soft text-fertile-sage-ink px-3 py-1 text-[0.75rem]"
+                    className="inline-flex items-center rounded-[8px] bg-fertile-sage-soft text-fertile-sage-ink px-2.5 py-1 text-[0.75rem]"
                   >
                     {t.dailyLog.activities[a]}
                   </span>
                 ))}
               </div>
               {log!.note.trim() ? (
-                <p className="text-[0.8125rem] leading-relaxed text-ink-secondary bg-tinted-subtle/60 rounded-[12px] px-3.5 py-2">
+                <p className="text-[0.8125rem] leading-relaxed text-ink-secondary bg-tinted-subtle/60 rounded-[12px] px-4 py-2.5">
                   {log!.note}
                 </p>
               ) : null}
@@ -228,7 +228,7 @@ export function SelectedDayPanel({ date, onOpenDetails }: SelectedDayPanelProps)
             fullWidth
             onClick={() => onOpenDetails(date)}
           >
-            <PenLine className="w-4 h-4" />
+            <PenLine className="w-4 h-4" strokeWidth={1.6} />
             <span>
               {hasDetailTags
                 ? t.calendar.selectedDay.editDetails

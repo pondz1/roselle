@@ -29,17 +29,19 @@ export function TopPatternsList({ topSymptoms, topMoods }: TopPatternsListProps)
                 {t.insights.topSymptomsTitle}
               </h2>
               <div className="space-y-3">
-                {topSymptoms.slice(0, 5).map((item) => (
+                {topSymptoms.slice(0, 5).map((item, idx) => (
                   <div key={item.id}>
-                    <div className="flex items-center justify-between text-[0.875rem] mb-1">
-                      <span className="text-ink-primary">{t.dailyLog.symptoms[item.id]}</span>
-                      <span className="text-[0.75rem] text-ink-secondary tabular-nums">
+                    <div className="flex items-center justify-between text-[0.875rem] mb-1.5">
+                      <span className={idx === 0 ? 'font-medium text-ink-primary' : 'text-ink-primary'}>
+                        {t.dailyLog.symptoms[item.id]}
+                      </span>
+                      <span className="text-[0.75rem] text-ink-muted tabular-nums">
                         {t.insights.loggedTimes(item.count, item.percentage)}
                       </span>
                     </div>
-                    <div className="h-2 rounded-full bg-tinted-subtle overflow-hidden">
+                    <div className="h-1.5 rounded-[3px] bg-tinted-subtle overflow-hidden">
                       <div
-                        className="h-full rounded-full bg-coral-rose"
+                        className={`h-full rounded-[3px] ${idx === 0 ? 'bg-coral-rose' : 'bg-chart-muted'}`}
                         style={{ width: `${Math.max(8, item.percentage)}%` }}
                       />
                     </div>
@@ -55,17 +57,19 @@ export function TopPatternsList({ topSymptoms, topMoods }: TopPatternsListProps)
                 {t.insights.topMoodsTitle}
               </h2>
               <div className="space-y-3">
-                {topMoods.slice(0, 5).map((item) => (
+                {topMoods.slice(0, 5).map((item, idx) => (
                   <div key={item.id}>
-                    <div className="flex items-center justify-between text-[0.875rem] mb-1">
-                      <span className="text-ink-primary">{t.dailyLog.moods[item.id]}</span>
-                      <span className="text-[0.75rem] text-ink-secondary tabular-nums">
+                    <div className="flex items-center justify-between text-[0.875rem] mb-1.5">
+                      <span className={idx === 0 ? 'font-medium text-ink-primary' : 'text-ink-primary'}>
+                        {t.dailyLog.moods[item.id]}
+                      </span>
+                      <span className="text-[0.75rem] text-ink-muted tabular-nums">
                         {t.insights.loggedTimes(item.count, item.percentage)}
                       </span>
                     </div>
-                    <div className="h-2 rounded-full bg-tinted-subtle overflow-hidden">
+                    <div className="h-1.5 rounded-[3px] bg-tinted-subtle overflow-hidden">
                       <div
-                        className="h-full rounded-full bg-fertile-sage"
+                        className={`h-full rounded-[3px] ${idx === 0 ? 'bg-fertile-sage' : 'bg-chart-muted'}`}
                         style={{ width: `${Math.max(8, item.percentage)}%` }}
                       />
                     </div>

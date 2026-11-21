@@ -22,9 +22,9 @@ const VARIANT_CLASSES: Record<ButtonVariant, string> = {
 };
 
 const SIZE_CLASSES: Record<ButtonSize, string> = {
-  sm: 'min-h-10 px-4 py-2 text-[0.8125rem]',
-  md: 'min-h-11 px-5 py-2.5 text-[0.9375rem]',
-  lg: 'min-h-12 px-6 py-3 text-[0.9375rem]',
+  sm: 'min-h-10 px-4 py-2 text-[0.8125rem] rounded-[10px]',
+  md: 'min-h-11 px-4 py-2 text-[0.9375rem] rounded-[12px]',
+  lg: 'min-h-12 px-5 py-3 text-[0.9375rem] rounded-[12px]',
 };
 
 export function Button({
@@ -40,8 +40,8 @@ export function Button({
     <button
       type={type}
       className={[
-        'inline-flex items-center justify-center gap-2 rounded-full font-medium shrink-0 whitespace-nowrap',
-        'transition-[background-color,color,transform,opacity] duration-[180ms] ease-[cubic-bezier(0.16,1,0.3,1)]',
+        'inline-flex items-center justify-center gap-2 font-medium shrink-0 whitespace-nowrap',
+        'transition-[background-color,color,transform,opacity] duration-[160ms] ease-[cubic-bezier(0.22,1,0.36,1)]',
         'disabled:opacity-45 disabled:pointer-events-none select-none',
         VARIANT_CLASSES[variant],
         SIZE_CLASSES[size],

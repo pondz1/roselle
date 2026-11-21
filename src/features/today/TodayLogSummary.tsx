@@ -26,7 +26,7 @@ export function TodayLogSummary({ log, onEdit }: TodayLogSummaryProps) {
           {t.today.todayLogHeading}
         </h2>
         <Button variant="ghost" size="sm" onClick={onEdit} className="-mr-2">
-          <Plus className="w-4 h-4" />
+          <Plus className="w-4 h-4" strokeWidth={1.6} />
           <span>{hasTags ? t.common.edit : t.today.addDailyLog}</span>
         </Button>
       </div>
@@ -35,22 +35,22 @@ export function TodayLogSummary({ log, onEdit }: TodayLogSummaryProps) {
         <button
           type="button"
           onClick={onEdit}
-          className="w-full text-left rounded-[14px] bg-tinted-subtle/80 hover:bg-tinted-subtle px-4 py-3.5 text-[0.875rem] text-ink-secondary transition-colors duration-[160ms]"
+          className="w-full text-left rounded-[12px] bg-tinted-subtle/80 hover:bg-tinted-subtle px-4 py-3 text-[0.875rem] text-ink-secondary transition-colors duration-[150ms]"
         >
           {t.today.noLogsToday}
         </button>
       ) : (
         <div className="space-y-3">
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap gap-2">
             {log!.flow !== 'none' ? (
-              <span className="inline-flex items-center rounded-full bg-coral-rose-soft text-coral-rose-ink px-3 py-1 text-[0.8125rem] font-medium">
+              <span className="inline-flex items-center rounded-[8px] bg-coral-rose-soft text-coral-rose-ink px-2.5 py-1 text-[0.8125rem] font-medium">
                 {t.dailyLog.flow[log!.flow]}
               </span>
             ) : null}
             {log!.symptoms.map((s) => (
               <span
                 key={s}
-                className="inline-flex items-center rounded-full bg-tinted-subtle text-ink-primary px-3 py-1 text-[0.8125rem]"
+                className="inline-flex items-center rounded-[8px] bg-tinted-subtle text-ink-primary px-2.5 py-1 text-[0.8125rem]"
               >
                 {t.dailyLog.symptoms[s]}
               </span>
@@ -58,7 +58,7 @@ export function TodayLogSummary({ log, onEdit }: TodayLogSummaryProps) {
             {log!.moods.map((m) => (
               <span
                 key={m}
-                className="inline-flex items-center rounded-full bg-tinted-subtle text-ink-primary px-3 py-1 text-[0.8125rem]"
+                className="inline-flex items-center rounded-[8px] bg-tinted-subtle text-ink-primary px-2.5 py-1 text-[0.8125rem]"
               >
                 {t.dailyLog.moods[m]}
               </span>
@@ -66,14 +66,14 @@ export function TodayLogSummary({ log, onEdit }: TodayLogSummaryProps) {
             {log!.activities.map((a) => (
               <span
                 key={a}
-                className="inline-flex items-center rounded-full bg-fertile-sage-soft text-fertile-sage-ink px-3 py-1 text-[0.8125rem]"
+                className="inline-flex items-center rounded-[8px] bg-fertile-sage-soft text-fertile-sage-ink px-2.5 py-1 text-[0.8125rem]"
               >
                 {t.dailyLog.activities[a]}
               </span>
             ))}
           </div>
           {log!.note.trim() ? (
-            <p className="text-[0.875rem] leading-relaxed text-ink-secondary bg-tinted-subtle/60 rounded-[14px] px-3.5 py-2.5">
+            <p className="text-[0.875rem] leading-relaxed text-ink-secondary bg-tinted-subtle/60 rounded-[12px] px-4 py-3">
               {log!.note}
             </p>
           ) : null}

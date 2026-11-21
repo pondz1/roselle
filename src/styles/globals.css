@@ -6,6 +6,7 @@
   --color-warm-surface: var(--color-warm-surface);
   --color-tinted-subtle: var(--color-tinted-subtle);
   --color-rose-hairline: var(--color-rose-hairline);
+  --color-chart-muted: var(--color-chart-muted);
   --color-ink-primary: var(--color-ink-primary);
   --color-ink-secondary: var(--color-ink-secondary);
   --color-ink-muted: var(--color-ink-muted);
@@ -18,6 +19,7 @@
   --color-fertile-sage-soft: var(--color-fertile-sage-soft);
   --color-fertile-sage-ink: var(--color-fertile-sage-ink);
   --color-amber-late: var(--color-amber-late);
+  --color-amber-late-ink: var(--color-amber-late-ink);
   --color-amber-late-soft: var(--color-amber-late-soft);
   --color-danger-ink: var(--color-danger-ink);
   --color-danger-soft: var(--color-danger-soft);

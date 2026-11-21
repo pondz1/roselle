@@ -38,22 +38,19 @@ export function CycleHistoryList({ history }: CycleHistoryListProps) {
 
               <div className="shrink-0 flex items-center gap-2">
                 {item.isOutlier ? (
-                  <span className="rounded-full bg-amber-late-soft text-amber-late px-2.5 py-0.5 text-[0.75rem] font-medium">
+                  <span className="rounded-[6px] bg-amber-late-soft text-amber-late-ink px-2 py-0.5 text-[0.75rem] font-medium">
                     {t.insights.outlierBadge}
                   </span>
                 ) : null}
-                <span
-                  className={[
-                    'rounded-full px-3 py-1 text-[0.8125rem] font-medium tabular-nums',
-                    item.cycleLength === null
-                      ? 'bg-coral-rose-soft text-coral-rose-ink'
-                      : 'bg-tinted-subtle text-ink-primary',
-                  ].join(' ')}
-                >
-                  {item.cycleLength === null
-                    ? t.insights.ongoingCycle
-                    : t.insights.cycleDaysCount(item.cycleLength)}
-                </span>
+                {item.cycleLength === null ? (
+                  <span className="rounded-[6px] bg-coral-rose-soft text-coral-rose-ink px-2.5 py-1 text-[0.8125rem] font-medium">
+                    {t.insights.ongoingCycle}
+                  </span>
+                ) : (
+                  <span className="text-[0.875rem] font-medium text-ink-secondary tabular-nums">
+                    {t.insights.cycleDaysCount(item.cycleLength)}
+                  </span>
+                )}
               </div>
             </div>
           ))}

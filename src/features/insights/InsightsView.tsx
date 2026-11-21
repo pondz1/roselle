@@ -11,16 +11,16 @@ export function InsightsView() {
   return (
     <div className="flex flex-col pb-8">
       <header className="px-5 pt-6 pb-4">
-        <h1 className="text-[1.375rem] font-semibold tracking-tight text-ink-primary">
+        <h1 className="text-[1.375rem] font-semibold text-ink-primary">
           {t.insights.title}
         </h1>
       </header>
 
       <section className="px-5 pb-5">
-        <div className="grid grid-cols-3 divide-x divide-rose-hairline rounded-[16px] bg-tinted-subtle/75 py-4">
+        <div className="grid grid-cols-3 divide-x divide-rose-hairline rounded-[12px] bg-tinted-subtle/75 py-4">
           <div className="px-3 text-center">
             <p className="text-[0.75rem] text-ink-muted">{t.insights.avgCycle}</p>
-            <p className="mt-1 text-[1.125rem] font-bold text-ink-primary tabular-nums">
+            <p className="mt-1 text-[1.125rem] font-semibold text-ink-primary tabular-nums">
               {insights.averageCycleLength !== null
                 ? t.common.days(insights.averageCycleLength)
                 : t.insights.noValue}
@@ -28,7 +28,7 @@ export function InsightsView() {
           </div>
           <div className="px-3 text-center">
             <p className="text-[0.75rem] text-ink-muted">{t.insights.avgPeriod}</p>
-            <p className="mt-1 text-[1.125rem] font-bold text-coral-rose-ink tabular-nums">
+            <p className="mt-1 text-[1.125rem] font-semibold text-coral-rose-ink tabular-nums">
               {insights.averagePeriodLength !== null
                 ? t.common.days(insights.averagePeriodLength)
                 : t.insights.noValue}
@@ -36,7 +36,7 @@ export function InsightsView() {
           </div>
           <div className="px-3 text-center">
             <p className="text-[0.75rem] text-ink-muted">{t.insights.variation}</p>
-            <p className="mt-1 text-[1.125rem] font-bold text-ink-primary tabular-nums">
+            <p className="mt-1 text-[1.125rem] font-semibold text-ink-primary tabular-nums">
               {insights.cycleVariation !== null
                 ? `±${insights.cycleVariation} ${t.common.dayShort}`
                 : t.insights.noValue}

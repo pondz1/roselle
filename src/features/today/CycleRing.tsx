@@ -124,11 +124,11 @@ export function CycleRing({ summary }: CycleRingProps) {
               {eyebrow}
             </span>
           ) : null}
-          <div className="mt-1 text-[1.1875rem] font-bold leading-snug text-ink-primary tabular-nums text-balance">
+          <div className="mt-1 text-[1.1875rem] font-semibold leading-snug text-ink-primary tabular-nums text-balance">
             {headline}
           </div>
           {subtext ? (
-            <p className="mt-1.5 text-[0.75rem] leading-snug text-ink-secondary max-w-[18ch] tabular-nums">
+            <p className="mt-2 text-[0.75rem] leading-snug text-ink-secondary max-w-[18ch] tabular-nums">
               {subtext}
             </p>
           ) : null}
@@ -136,7 +136,7 @@ export function CycleRing({ summary }: CycleRingProps) {
       </div>
 
       <div
-        className={`mt-4 inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[0.8125rem] font-medium ${chancePillClass}`}
+        className={`mt-4 inline-flex items-center gap-1.5 rounded-[8px] px-3 py-1.5 text-[0.8125rem] font-medium ${chancePillClass}`}
       >
         <span>{t.today.conceptionChanceLabel}:</span>
         <span className="font-semibold">{t.today.conceptionChance[summary.conceptionChance]}</span>

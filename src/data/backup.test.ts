@@ -66,4 +66,64 @@ describe('parseBackupSnapshot', () => {
     };
     expect(parseBackupSnapshot(badSymptom)).toEqual({ ok: false, errorCode: 'INVALID_LOGS' });
   });
+
+  it('defaults enabledTrackers and strips PIN credentials when importing backups', () => {
+    const withTrackersAndPin = {
+      ...validSnapshot,
+      settings: {
+        ...validSnapshot.settings,
+        enabledTrackers: { weight: true, bbt: false, pill: true },
+        pinHash: 'deadbeef',
+        pinSalt: 'salt',
+      },
+      logs: [
+        {
+          ...validSnapshot.logs[0],
+          weightKg: 52.5,
+          bbtCelsius: 36.55,
+          pillTaken: true,
+        },
+      ],
+    };
+
+    const result = parseBackupSnapshot(withTrackersAndPin);
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.data.settings.enabledTrackers).toEqual({
+        weight: true,
+        bbt: false,
+        pill: true,
+      });
+      expect(result.data.settings.pinHash).toBeNull();
+      expect(result.data.settings.pinSalt).toBeNull();
+      expect(result.data.logs[0]).toMatchObject({
+        weightKg: 52.5,
+        bbtCelsius: 36.55,
+        pillTaken: true,
+      });
+    }
+  });
+
+  it('rejects out-of-range optional metrics or malformed enabledTrackers', () => {
+    const badWeight = {
+      ...validSnapshot,
+      logs: [{ ...validSnapshot.logs[0], weightKg: 500 }],
+    };
+    expect(parseBackupSnapshot(badWeight)).toEqual({ ok: false, errorCode: 'INVALID_LOGS' });
+
+    const badBbt = {
+      ...validSnapshot,
+      logs: [{ ...validSnapshot.logs[0], bbtCelsius: 45 }],
+    };
+    expect(parseBackupSnapshot(badBbt)).toEqual({ ok: false, errorCode: 'INVALID_LOGS' });
+
+    const badTrackers = {
+      ...validSnapshot,
+      settings: {
+        ...validSnapshot.settings,
+        enabledTrackers: { weight: 'yes', bbt: false, pill: false },
+      },
+    };
+    expect(parseBackupSnapshot(badTrackers)).toEqual({ ok: false, errorCode: 'INVALID_SETTINGS' });
+  });
 });

@@ -69,4 +69,55 @@ describe('DailyLogSheet', () => {
     expect(screen.queryByRole('button', { name: 'บันทึก' })).not.toBeInTheDocument();
     await db.delete();
   });
+
+  it('hides optional trackers by default and saves validated values when enabled', async () => {
+    const db = new RoselleDatabase(`SheetTrackers_${Math.random().toString(36).slice(2)}`);
+    const repo = new DexieCycleRepository(db);
+    const user = userEvent.setup();
+
+    const firstRender = render(
+      <CycleProvider repository={repo} todayOverride="2026-11-19">
+        <Harness date="2026-11-19" onClose={() => {}} />
+      </CycleProvider>,
+    );
+
+    expect(await screen.findByText('ปริมาณประจำเดือน')).toBeInTheDocument();
+    expect(screen.queryByText('บันทึกเสริม')).not.toBeInTheDocument();
+    firstRender.unmount();
+
+    await repo.updateSettings({
+      enabledTrackers: { weight: true, bbt: true, pill: true },
+    });
+
+    const onClose = vi.fn();
+    render(
+      <CycleProvider repository={repo} todayOverride="2026-11-19">
+        <Harness date="2026-11-19" onClose={onClose} />
+      </CycleProvider>,
+    );
+
+    expect(await screen.findByText('บันทึกเสริม')).toBeInTheDocument();
+
+    // Out-of-range weight shows validation error and blocks saving
+    await user.type(screen.getByLabelText('น้ำหนัก'), '500');
+    await user.click(screen.getByRole('button', { name: 'บันทึก' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('20 ถึง 250');
+    expect(onClose).not.toHaveBeenCalled();
+
+    // Enter valid weight, BBT, and pill taken
+    await user.clear(screen.getByLabelText('น้ำหนัก'));
+    await user.type(screen.getByLabelText('น้ำหนัก'), '53.2');
+    await user.type(screen.getByLabelText('อุณหภูมิร่างกาย (BBT)'), '36.58');
+    await user.click(screen.getByRole('button', { name: 'ทานยาคุมแล้ว' }));
+    await user.click(screen.getByRole('button', { name: 'บันทึก' }));
+
+    await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
+    const saved = await repo.getLogByDate('2026-11-19');
+    expect(saved).toMatchObject({
+      weightKg: 53.2,
+      bbtCelsius: 36.58,
+      pillTaken: true,
+    });
+    await db.delete();
+  });
 });

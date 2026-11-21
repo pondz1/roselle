@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { AlertCircle } from 'lucide-react';
 import { AppShell } from './components/layout/AppShell';
 import { BottomNav, type TabId } from './components/layout/BottomNav';
@@ -9,6 +9,7 @@ import { CalendarView } from './features/calendar/CalendarView';
 import { DailyLogSheet } from './features/daily-log/DailyLogSheet';
 import { InsightsView } from './features/insights/InsightsView';
 import { LandingPage } from './features/landing/LandingPage';
+import { PinLockScreen } from './features/lock/PinLockScreen';
 import { OnboardingFlow } from './features/onboarding/OnboardingFlow';
 import { SettingsView } from './features/settings/SettingsView';
 import { TodayView } from './features/today/TodayView';
@@ -21,6 +22,24 @@ function AppContent() {
 
   const [activeTab, setActiveTab] = useState<TabId>('today');
   const [logSheetDate, setLogSheetDate] = useState<ISODate | null>(null);
+  const [isLocked, setIsLocked] = useState(false);
+  const lockInitializedRef = useRef(false);
+
+  const hasPin = Boolean(settings.pinHash && settings.pinSalt);
+
+  useEffect(() => {
+    if (loading) return;
+    if (!lockInitializedRef.current) {
+      lockInitializedRef.current = true;
+      if (hasPin) {
+        setIsLocked(true);
+      }
+      return;
+    }
+    if (!hasPin) {
+      setIsLocked(false);
+    }
+  }, [hasPin, loading]);
 
   if (loading) {
     return (
@@ -55,6 +74,16 @@ function AppContent() {
     );
   }
 
+  if (isLocked && settings.pinHash && settings.pinSalt) {
+    return (
+      <PinLockScreen
+        pinHash={settings.pinHash}
+        pinSalt={settings.pinSalt}
+        onUnlock={() => setIsLocked(false)}
+      />
+    );
+  }
+
   if (!settings.onboardingCompleted) {
     return <OnboardingFlow />;
   }
@@ -66,7 +95,7 @@ function AppContent() {
       {activeTab === 'today' ? <TodayView onOpenLog={setLogSheetDate} /> : null}
       {activeTab === 'calendar' ? <CalendarView onSelectDate={setLogSheetDate} /> : null}
       {activeTab === 'insights' ? <InsightsView /> : null}
-      {activeTab === 'settings' ? <SettingsView /> : null}
+      {activeTab === 'settings' ? <SettingsView onLockNow={() => setIsLocked(true)} /> : null}
 
       <DailyLogSheet
         date={logSheetDate}

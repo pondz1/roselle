@@ -31,7 +31,10 @@ function hasNonFlowLogs(log: DailyLog): boolean {
     log.symptoms.length > 0 ||
     log.moods.length > 0 ||
     log.activities.length > 0 ||
-    log.note.trim().length > 0
+    log.note.trim().length > 0 ||
+    (log.weightKg !== undefined && log.weightKg !== null) ||
+    (log.bbtCelsius !== undefined && log.bbtCelsius !== null) ||
+    log.pillTaken === true
   );
 }
 

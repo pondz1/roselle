@@ -1,4 +1,5 @@
 import {
+  DEFAULT_OPTIONAL_TRACKERS,
   DEFAULT_USER_SETTINGS,
   type DailyLog,
   type DailyLogInput,
@@ -14,7 +15,10 @@ function isEmptyLogInput(input: DailyLogInput): boolean {
     input.symptoms.length === 0 &&
     input.moods.length === 0 &&
     input.activities.length === 0 &&
-    input.note.trim().length === 0
+    input.note.trim().length === 0 &&
+    (input.weightKg === undefined || input.weightKg === null) &&
+    (input.bbtCelsius === undefined || input.bbtCelsius === null) &&
+    !input.pillTaken
   );
 }
 
@@ -43,6 +47,9 @@ export class DexieCycleRepository implements CycleRepository {
       return {
         ...input,
         note: '',
+        weightKg: null,
+        bbtCelsius: null,
+        pillTaken: false,
         updatedAt: now,
         deletedAt: now,
         syncStatus: 'pending',
@@ -51,6 +58,9 @@ export class DexieCycleRepository implements CycleRepository {
 
     const record: DailyLog = {
       ...input,
+      weightKg: input.weightKg ?? null,
+      bbtCelsius: input.bbtCelsius ?? null,
+      pillTaken: Boolean(input.pillTaken),
       note: input.note.trim().slice(0, 500),
       updatedAt: now,
       deletedAt: null,
@@ -83,6 +93,9 @@ export class DexieCycleRepository implements CycleRepository {
                 moods: existing.moods,
                 activities: existing.activities,
                 note: existing.note,
+                weightKg: existing.weightKg ?? null,
+                bbtCelsius: existing.bbtCelsius ?? null,
+                pillTaken: existing.pillTaken ?? false,
               }
             : {
                 date,
@@ -92,6 +105,9 @@ export class DexieCycleRepository implements CycleRepository {
                 moods: [],
                 activities: [],
                 note: '',
+                weightKg: null,
+                bbtCelsius: null,
+                pillTaken: false,
               };
 
         if (isEmptyLogInput(base)) {
@@ -100,6 +116,9 @@ export class DexieCycleRepository implements CycleRepository {
               ...existing,
               flow: 'none',
               periodEnded: false,
+              weightKg: null,
+              bbtCelsius: null,
+              pillTaken: false,
               updatedAt: now,
               deletedAt: now,
               syncStatus: 'pending',
@@ -128,6 +147,9 @@ export class DexieCycleRepository implements CycleRepository {
       moods: [],
       activities: [],
       note: '',
+      weightKg: null,
+      bbtCelsius: null,
+      pillTaken: false,
       updatedAt: now,
       deletedAt: now,
       syncStatus: 'pending',
@@ -136,7 +158,18 @@ export class DexieCycleRepository implements CycleRepository {
 
   async getSettings(): Promise<UserSettings> {
     const existing = await this.db.settings.get('default');
-    if (existing) return existing;
+    if (existing) {
+      return {
+        ...DEFAULT_USER_SETTINGS,
+        ...existing,
+        enabledTrackers: {
+          ...DEFAULT_OPTIONAL_TRACKERS,
+          ...(existing.enabledTrackers ?? {}),
+        },
+        pinHash: existing.pinHash ?? null,
+        pinSalt: existing.pinSalt ?? null,
+      };
+    }
     const created: UserSettings = {
       ...DEFAULT_USER_SETTINGS,
       updatedAt: new Date().toISOString(),
@@ -152,6 +185,11 @@ export class DexieCycleRepository implements CycleRepository {
     const updated: UserSettings = {
       ...current,
       ...patch,
+      enabledTrackers: {
+        ...DEFAULT_OPTIONAL_TRACKERS,
+        ...(current.enabledTrackers ?? {}),
+        ...(patch.enabledTrackers ?? {}),
+      },
       id: 'default',
       updatedAt: new Date().toISOString(),
     };
@@ -164,7 +202,11 @@ export class DexieCycleRepository implements CycleRepository {
     return {
       version: 1,
       exportedAt: new Date().toISOString(),
-      settings,
+      settings: {
+        ...settings,
+        pinHash: null,
+        pinSalt: null,
+      },
       logs,
     };
   }

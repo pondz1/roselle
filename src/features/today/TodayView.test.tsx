@@ -97,6 +97,52 @@ describe('TodayView', () => {
     const activeMarker = container.querySelector('[data-active="true"]');
     expect(activeMarker).toHaveAttribute('data-cycle-day', '11');
 
+    // Interactive wheel: inspect ovulation day (day 15 = Nov 26)
+    await userEvent.click(container.querySelector('[data-cycle-day="15"]')!);
+    expect(await screen.findByText('วันที่ 15 ของรอบเดือน')).toBeInTheDocument();
+    expect(
+      container.querySelector('[data-cycle-day="15"][data-inspected="true"]'),
+    ).toBeInTheDocument();
+    expect(screen.getAllByText('วันไข่ตก (คาดการณ์)').length).toBeGreaterThanOrEqual(2);
+    const backButton = screen.getByRole('button', { name: 'กลับสู่วันนี้' });
+    await userEvent.click(backButton);
+    expect(screen.queryByRole('button', { name: 'กลับสู่วันนี้' })).not.toBeInTheDocument();
+
+    // Phase guide card renders offline tip
+    expect(screen.getByText('คำแนะนำช่วงเจริญพันธุ์')).toBeInTheDocument();
+    expect(screen.getByText(/เหมาะกับการติดตามอุณหภูมิร่างกาย/)).toBeInTheDocument();
+
+    await db.delete();
+  });
+
+  it('displays recorded optional health tracker badges in TodayLogSummary', async () => {
+    const db = new RoselleDatabase(`TodayTrackers_${Math.random().toString(36).slice(2)}`);
+    const repo = new DexieCycleRepository(db);
+    await repo.updateSettings({
+      onboardingCompleted: true,
+      enabledTrackers: { weight: true, bbt: true, pill: true },
+    });
+    await repo.upsertLog({
+      date: '2026-11-19',
+      flow: 'none',
+      symptoms: [],
+      moods: [],
+      activities: [],
+      note: '',
+      weightKg: 52.4,
+      bbtCelsius: 36.62,
+      pillTaken: true,
+    });
+
+    render(
+      <CycleProvider repository={repo} todayOverride="2026-11-19">
+        <Harness onOpenLog={() => {}} />
+      </CycleProvider>,
+    );
+
+    expect(await screen.findByText('52.4 กก.')).toBeInTheDocument();
+    expect(screen.getByText('36.62 °C')).toBeInTheDocument();
+    expect(screen.getByText('ทานยาคุมแล้ว')).toBeInTheDocument();
     await db.delete();
   });
 });

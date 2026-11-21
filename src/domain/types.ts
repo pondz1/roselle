@@ -33,6 +33,18 @@ export type MoodId = (typeof MOOD_IDS)[number];
 export const ACTIVITY_IDS = ['protected_sex', 'unprotected_sex', 'exercise'] as const;
 export type ActivityId = (typeof ACTIVITY_IDS)[number];
 
+export interface OptionalTrackersConfig {
+  weight: boolean;
+  bbt: boolean;
+  pill: boolean;
+}
+
+export const DEFAULT_OPTIONAL_TRACKERS: OptionalTrackersConfig = {
+  weight: false,
+  bbt: false,
+  pill: false,
+};
+
 export interface DailyLog {
   date: ISODate;
   flow: FlowLevel;
@@ -41,6 +53,9 @@ export interface DailyLog {
   moods: MoodId[];
   activities: ActivityId[];
   note: string;
+  weightKg?: number | null;
+  bbtCelsius?: number | null;
+  pillTaken?: boolean;
   updatedAt: string;
   deletedAt: string | null;
   syncStatus: SyncStatus;
@@ -55,6 +70,9 @@ export interface UserSettings {
   lutealPhaseLength: number;
   locale: Locale;
   onboardingCompleted: boolean;
+  enabledTrackers?: OptionalTrackersConfig;
+  pinHash?: string | null;
+  pinSalt?: string | null;
   updatedAt: string;
 }
 
@@ -65,6 +83,9 @@ export const DEFAULT_USER_SETTINGS: Omit<UserSettings, 'updatedAt'> = {
   lutealPhaseLength: 14,
   locale: 'th',
   onboardingCompleted: false,
+  enabledTrackers: { ...DEFAULT_OPTIONAL_TRACKERS },
+  pinHash: null,
+  pinSalt: null,
 };
 
 export interface PeriodEpisode {

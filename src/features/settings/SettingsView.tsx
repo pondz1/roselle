@@ -2,6 +2,8 @@ import { ShieldCheck } from 'lucide-react';
 import { useI18n } from '../../i18n/I18nProvider';
 import { useCycle } from '../../state/CycleProvider';
 import { BackupControls } from './BackupControls';
+import { OptionalTrackersSection } from './OptionalTrackersSection';
+import { PinSettingsSection } from './PinSettingsSection';
 
 interface StepperRowProps {
   label: string;
@@ -43,7 +45,11 @@ function StepperRow({ label, value, min, max, unit, onChange }: StepperRowProps)
   );
 }
 
-export function SettingsView() {
+interface SettingsViewProps {
+  onLockNow?: () => void;
+}
+
+export function SettingsView({ onLockNow }: SettingsViewProps = {}) {
   const { settings, updateSettings } = useCycle();
   const { locale, setLocale, t } = useI18n();
 
@@ -116,6 +122,10 @@ export function SettingsView() {
           </div>
         </div>
       </section>
+
+      <OptionalTrackersSection />
+
+      <PinSettingsSection onLockNow={onLockNow} />
 
       <BackupControls />
 

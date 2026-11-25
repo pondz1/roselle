@@ -171,7 +171,7 @@ describe('CalendarView', () => {
       const logs = await repo.getAllLogs();
       expect(logs).toHaveLength(0);
     });
-    expect(screen.getByRole('button', { name: 'Period started' })).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: 'Period started' })).toBeInTheDocument();
     await db.delete();
   });
 
@@ -201,6 +201,40 @@ describe('CalendarView', () => {
       expect(nov11?.periodEnded).toBe(false);
       expect(nov12?.flow).toBe('medium');
     });
+    await db.delete();
+  });
+
+  it('offers Still on period and Period ended on unlogged Day 6 after a 5-day period', async () => {
+    const db = new RoselleDatabase(`CalDay6_${Math.random().toString(36).slice(2)}`);
+    const repo = new DexieCycleRepository(db);
+    await repo.updateSettings({
+      onboardingCompleted: true,
+      locale: 'en',
+      defaultPeriodLength: 5,
+    });
+    const user = userEvent.setup();
+
+    render(
+      <CycleProvider repository={repo} todayOverride="2026-11-26">
+        <Harness onSelectDate={() => {}} />
+      </CycleProvider>,
+    );
+
+    await user.click(await screen.findByTestId('cal-day-2026-11-21'));
+    await user.click(screen.getByRole('button', { name: 'Period started' }));
+    expect(await screen.findByText('Marked as period start')).toBeInTheDocument();
+
+    // Select Day 6 (Nov 26) beyond the 5-day auto window
+    await user.click(screen.getByTestId('cal-day-2026-11-26'));
+    expect(screen.queryByText('Ongoing period')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Still on period' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Period ended' })).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Still on period' }));
+    expect(await screen.findByText('Ongoing period')).toBeInTheDocument();
+    const day6 = await repo.getLogByDate('2026-11-26');
+    expect(day6?.flow).toBe('medium');
+    expect(day6?.periodEnded).toBe(false);
     await db.delete();
   });
 });

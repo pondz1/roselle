@@ -1,4 +1,4 @@
-import { Droplets, PenLine } from 'lucide-react';
+import { Check, Droplets, PenLine, SquareCheck } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { formatFullDate, formatShortDate } from '../../domain/date-utils';
@@ -15,11 +15,22 @@ interface TodayViewProps {
 }
 
 export function TodayView({ onOpenLog }: TodayViewProps) {
-  const { today, summary, logsByDate, toggleTodayPeriod, clearTodayPeriod } = useCycle();
+  const {
+    today,
+    summary,
+    logsByDate,
+    toggleTodayPeriod,
+    clearTodayPeriod,
+    markPeriodEnd,
+  } = useCycle();
   const { locale, setLocale, t } = useI18n();
 
   const todayLog = logsByDate.get(today);
   const isTodayLoggedPeriod = Boolean(todayLog && todayLog.flow !== 'none');
+  const isPeriodActiveToday = summary.status === 'period' || isTodayLoggedPeriod;
+  const isTodayMarkedEnded = Boolean(
+    todayLog && todayLog.flow !== 'none' && todayLog.periodEnded === true,
+  );
 
   return (
     <div className="flex flex-col pb-6">
@@ -77,20 +88,37 @@ export function TodayView({ onOpenLog }: TodayViewProps) {
           <CycleRing summary={summary} />
 
           <div className="mt-6 w-full flex flex-col gap-2">
-            {isTodayLoggedPeriod ? (
+            {isPeriodActiveToday ? (
               <>
                 <Button fullWidth size="lg" onClick={() => onOpenLog(today)}>
                   <PenLine className="w-4 h-4" strokeWidth={1.6} />
                   <span>{t.today.editTodayLog}</span>
                 </Button>
-                <Button
-                  fullWidth
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => void clearTodayPeriod()}
-                >
-                  {t.today.clearPeriodToday}
-                </Button>
+                {!isTodayMarkedEnded ? (
+                  <Button
+                    fullWidth
+                    variant="secondary"
+                    onClick={() => void markPeriodEnd(today)}
+                  >
+                    <SquareCheck className="w-4 h-4" strokeWidth={1.6} />
+                    <span>{t.today.endPeriodToday}</span>
+                  </Button>
+                ) : (
+                  <div className="flex items-center justify-center gap-1.5 rounded-[10px] bg-tinted-subtle px-3 py-2 text-[0.8125rem] font-medium text-ink-secondary">
+                    <Check className="w-4 h-4 text-coral-rose-ink" strokeWidth={1.6} />
+                    <span>{t.today.periodEndedToday}</span>
+                  </div>
+                )}
+                {isTodayLoggedPeriod ? (
+                  <Button
+                    fullWidth
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => void clearTodayPeriod()}
+                  >
+                    {t.today.clearPeriodToday}
+                  </Button>
+                ) : null}
               </>
             ) : (
               <Button fullWidth size="lg" onClick={() => void toggleTodayPeriod()}>

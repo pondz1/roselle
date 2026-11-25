@@ -89,6 +89,8 @@ export interface TranslationDict {
     logPeriodToday: string;
     editTodayLog: string;
     clearPeriodToday: string;
+    endPeriodToday: string;
+    periodEndedToday: string;
     nextPeriodLabel: string;
     ovulationDateLabel: string;
     todayLogHeading: string;
@@ -347,6 +349,8 @@ export const translations: Record<Locale, TranslationDict> = {
       logPeriodToday: 'บันทึกประจำเดือนวันนี้',
       editTodayLog: 'แก้ไขบันทึกวันนี้',
       clearPeriodToday: 'ยกเลิกวันประจำเดือนวันนี้',
+      endPeriodToday: 'ประจำเดือนหมดวันนี้',
+      periodEndedToday: 'บันทึกว่าประจำเดือนหมดวันนี้แล้ว',
       nextPeriodLabel: 'รอบถัดไป (คาดการณ์)',
       ovulationDateLabel: 'วันไข่ตก (คาดการณ์)',
       todayLogHeading: 'บันทึกของวันนี้',
@@ -667,6 +671,8 @@ export const translations: Record<Locale, TranslationDict> = {
       logPeriodToday: 'Log Period Today',
       editTodayLog: "Edit Today's Log",
       clearPeriodToday: 'Clear Period Today',
+      endPeriodToday: 'Period ended today',
+      periodEndedToday: 'Marked period ended today',
       nextPeriodLabel: 'Next period (est.)',
       ovulationDateLabel: 'Ovulation (est.)',
       todayLogHeading: "Today's Log",

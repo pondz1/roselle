@@ -124,4 +124,42 @@ describe('CalendarView', () => {
     });
     await db.delete();
   });
+
+  it('disables Period started on ongoing period days while keeping Period ended enabled', async () => {
+    const db = new RoselleDatabase(`CalGuard_${Math.random().toString(36).slice(2)}`);
+    const repo = new DexieCycleRepository(db);
+    await repo.updateSettings({
+      onboardingCompleted: true,
+      locale: 'en',
+      defaultPeriodLength: 5,
+    });
+    const user = userEvent.setup();
+
+    render(
+      <CycleProvider repository={repo} todayOverride="2026-11-25">
+        <Harness onSelectDate={() => {}} />
+      </CycleProvider>,
+    );
+
+    // Start period on Nov 21
+    await user.click(await screen.findByTestId('cal-day-2026-11-21'));
+    await user.click(screen.getByRole('button', { name: 'Period started' }));
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Marked as period start' })).toBeEnabled(),
+    );
+
+    // Selecting Day 2 (Nov 22) or Day 3 (Nov 23) within ongoing period disables "Period started"
+    await user.click(screen.getByTestId('cal-day-2026-11-22'));
+    expect(screen.getByRole('button', { name: 'Period started' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Period ended' })).toBeEnabled();
+
+    await user.click(screen.getByTestId('cal-day-2026-11-23'));
+    expect(screen.getByRole('button', { name: 'Period started' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Period ended' })).toBeEnabled();
+
+    // Nov 21 start date can still be toggled
+    await user.click(screen.getByTestId('cal-day-2026-11-21'));
+    expect(screen.getByRole('button', { name: 'Marked as period start' })).toBeEnabled();
+    await db.delete();
+  });
 });

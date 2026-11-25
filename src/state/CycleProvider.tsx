@@ -193,6 +193,12 @@ export function CycleProvider({ repository, todayOverride, children }: CycleProv
   const markPeriodStart = useCallback(
     async (date: ISODate) => {
       if (compareDates(date, today) > 0) return;
+      const isInsideExistingEpisode = episodes.some((ep) => {
+        const offset = diffDays(ep.startDate, date);
+        return offset > 0 && offset <= 12;
+      });
+      if (isInsideExistingEpisode) return;
+
       const updates: PeriodDayUpdate[] = [];
       for (let i = 0; i < settings.defaultPeriodLength; i += 1) {
         const d = addDays(date, i);
@@ -207,7 +213,7 @@ export function CycleProvider({ repository, todayOverride, children }: CycleProv
       const nextLogs = await repo.getAllLogs();
       setLogs(nextLogs);
     },
-    [logsByDate, repo, settings.defaultPeriodLength, today],
+    [episodes, logsByDate, repo, settings.defaultPeriodLength, today],
   );
 
   const markPeriodEnd = useCallback(

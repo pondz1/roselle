@@ -36,6 +36,8 @@ export function SelectedDayPanel({ date, onOpenDetails }: SelectedDayPanelProps)
     });
 
   const isEpisodeStart = Boolean(matchingEpisode && matchingEpisode.startDate === date);
+  const isInsideExistingEpisode = Boolean(matchingEpisode && matchingEpisode.startDate !== date);
+  const canMarkStart = !isInsideExistingEpisode;
   const isMarkedEnded = Boolean(log && log.flow !== 'none' && log.periodEnded === true);
   const canMarkEnd = Boolean(matchingEpisode);
 
@@ -67,6 +69,7 @@ export function SelectedDayPanel({ date, onOpenDetails }: SelectedDayPanelProps)
       log!.pillTaken === true);
 
   const handleToggleStart = async () => {
+    if (!canMarkStart) return;
     if (isEpisodeStart && matchingEpisode && matchingEpisode.loggedDays.length === 1) {
       await clearPeriodDay(date);
       return;
@@ -127,10 +130,12 @@ export function SelectedDayPanel({ date, onOpenDetails }: SelectedDayPanelProps)
             <button
               type="button"
               aria-pressed={isEpisodeStart}
+              disabled={!canMarkStart}
               onClick={() => void handleToggleStart()}
               className={[
                 'flex items-center justify-center gap-2 min-h-11 px-3 py-2 rounded-[10px]',
                 'text-[0.8125rem] font-medium border-[1.5px] transition-[background-color,color,border-color,transform] duration-[150ms] active:scale-[0.98]',
+                'disabled:opacity-40 disabled:pointer-events-none',
                 isEpisodeStart
                   ? 'bg-coral-rose text-warm-surface border-coral-rose'
                   : 'bg-coral-rose-soft/80 text-coral-rose-ink border-transparent hover:bg-coral-rose-soft',

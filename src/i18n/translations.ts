@@ -41,6 +41,7 @@ export interface TranslationDict {
     lastPeriodLabel: string;
     lastPeriodPlaceholder: string;
     lastPeriodHint: string;
+    futureDateError: string;
     periodLengthTitle: string;
     periodLengthBody: string;
     cycleLengthTitle: string;
@@ -230,6 +231,10 @@ export interface TranslationDict {
     pinUnlockTitle: string;
     pinUnlockSubtitle: string;
     pinDeleteDigit: string;
+    pinForgotButton: string;
+    pinForgotTitle: string;
+    pinForgotBody: string;
+    pinForgotConfirmAction: string;
     backupTitle: string;
     backupDescription: string;
     exportButton: string;
@@ -282,6 +287,7 @@ export const translations: Record<Locale, TranslationDict> = {
       lastPeriodLabel: 'วันแรกของประจำเดือนครั้งล่าสุด',
       lastPeriodPlaceholder: 'เลือกวันที่ (ไม่บังคับ)',
       lastPeriodHint: 'เลือกวันที่เริ่มมา หรือกดข้ามเพื่อบันทึกภายหลังได้',
+      futureDateError: 'วันที่ต้องไม่เกินวันปัจจุบัน',
       periodLengthTitle: 'ประจำเดือนของคุณมักมากี่วัน',
       periodLengthBody: 'ค่ามาตรฐานคือ 5 วัน แอปจะปรับตามสถิติจริงเมื่อคุณบันทึกมากขึ้น',
       cycleLengthTitle: 'ความยาวรอบเดือนปกติของคุณ',
@@ -547,6 +553,11 @@ export const translations: Record<Locale, TranslationDict> = {
       pinUnlockTitle: 'ใส่รหัส PIN เพื่อเปิด Roselle',
       pinUnlockSubtitle: 'รหัสของคุณถูกเก็บแบบเข้ารหัสบนเครื่องนี้เท่านั้น',
       pinDeleteDigit: 'ลบตัวเลข',
+      pinForgotButton: 'ลืมรหัส PIN?',
+      pinForgotTitle: 'ล้างข้อมูลเพื่อปลดล็อกแอป',
+      pinForgotBody:
+        'หากลืมรหัส PIN ระบบไม่สามารถกู้คืนรหัสเดิมได้ คุณสามารถล้างประวัติรอบเดือน บันทึกรายวัน และรหัส PIN ทั้งหมดบนเครื่องนี้เพื่อเริ่มใช้งานใหม่',
+      pinForgotConfirmAction: 'ล้างข้อมูลทั้งหมดและปลดล็อก',
       backupTitle: 'สำรองและกู้คืนข้อมูล',
       backupDescription: 'ส่งออกข้อมูลเป็นไฟล์ JSON เพื่อเก็บสำรอง หรือกู้คืนลงเครื่องนี้',
       exportButton: 'ส่งออก JSON',
@@ -604,6 +615,7 @@ export const translations: Record<Locale, TranslationDict> = {
       lastPeriodLabel: 'First day of your last period',
       lastPeriodPlaceholder: 'Select date (optional)',
       lastPeriodHint: 'Pick a start date or skip to log later.',
+      futureDateError: 'Date cannot be in the future.',
       periodLengthTitle: 'How long does your period usually last?',
       periodLengthBody: 'Typical length is 5 days. Predictions adapt as you log more cycles.',
       cycleLengthTitle: 'How long is your typical cycle?',
@@ -869,6 +881,11 @@ export const translations: Record<Locale, TranslationDict> = {
       pinUnlockTitle: 'Enter PIN to unlock Roselle',
       pinUnlockSubtitle: 'Your PIN is verified locally on this device.',
       pinDeleteDigit: 'Delete digit',
+      pinForgotButton: 'Forgot PIN?',
+      pinForgotTitle: 'Reset data to unlock app',
+      pinForgotBody:
+        'Forgotten PINs cannot be recovered. You can permanently erase all cycle history, daily logs, and the PIN lock on this device to start fresh.',
+      pinForgotConfirmAction: 'Erase all data & unlock',
       backupTitle: 'Backup & Restore',
       backupDescription: 'Export your data as JSON for safekeeping or restore an earlier backup.',
       exportButton: 'Export JSON',

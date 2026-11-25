@@ -120,4 +120,28 @@ describe('DailyLogSheet', () => {
     });
     await db.delete();
   });
+
+  it('preserves periodEnded flag when editing symptoms on an ended period day', async () => {
+    const db = new RoselleDatabase(`SheetEnded_${Math.random().toString(36).slice(2)}`);
+    const repo = new DexieCycleRepository(db);
+    await repo.bulkSetPeriodDays([{ date: '2026-11-19', flow: 'medium', periodEnded: true }]);
+    const user = userEvent.setup();
+    const onClose = vi.fn();
+
+    render(
+      <CycleProvider repository={repo} todayOverride="2026-11-19">
+        <Harness date="2026-11-19" onClose={onClose} />
+      </CycleProvider>,
+    );
+
+    await user.click(await screen.findByRole('button', { name: 'ปวดท้องน้อย' }));
+    await user.click(screen.getByRole('button', { name: 'บันทึก' }));
+
+    await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
+    const updated = await repo.getLogByDate('2026-11-19');
+    expect(updated?.flow).toBe('medium');
+    expect(updated?.periodEnded).toBe(true);
+    expect(updated?.symptoms).toEqual(['cramps']);
+    await db.delete();
+  });
 });

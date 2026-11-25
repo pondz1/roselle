@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Lock } from 'lucide-react';
 import { AppShell } from '../../components/layout/AppShell';
+import { BottomSheet } from '../../components/ui/BottomSheet';
+import { Button } from '../../components/ui/Button';
 import { verifyPin } from '../../domain/pin';
 import { useI18n } from '../../i18n/I18nProvider';
 import { PinKeypad } from './PinKeypad';
@@ -9,13 +11,21 @@ interface PinLockScreenProps {
   pinHash: string;
   pinSalt: string;
   onUnlock: () => void;
+  onResetAllData?: () => Promise<void>;
 }
 
-export function PinLockScreen({ pinHash, pinSalt, onUnlock }: PinLockScreenProps) {
+export function PinLockScreen({
+  pinHash,
+  pinSalt,
+  onUnlock,
+  onResetAllData,
+}: PinLockScreenProps) {
   const { t } = useI18n();
   const [pin, setPin] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [verifying, setVerifying] = useState(false);
+  const [resetSheetOpen, setResetSheetOpen] = useState(false);
+  const [resetting, setResetting] = useState(false);
 
   const handleChange = async (next: string) => {
     if (error) setError(null);
@@ -33,6 +43,18 @@ export function PinLockScreen({ pinHash, pinSalt, onUnlock }: PinLockScreenProps
       }
     } finally {
       setVerifying(false);
+    }
+  };
+
+  const handleConfirmReset = async () => {
+    if (!onResetAllData) return;
+    setResetting(true);
+    try {
+      await onResetAllData();
+      setResetSheetOpen(false);
+      onUnlock();
+    } finally {
+      setResetting(false);
     }
   };
 
@@ -56,11 +78,60 @@ export function PinLockScreen({ pinHash, pinSalt, onUnlock }: PinLockScreenProps
               void handleChange(next);
             }}
             error={error}
-            disabled={verifying}
+            disabled={verifying || resetting}
             deleteLabel={t.settings.pinDeleteDigit}
+            keyboardEnabled={!resetSheetOpen}
           />
         </div>
+
+        {onResetAllData ? (
+          <div className="mt-6">
+            <Button
+              variant="ghost"
+              size="sm"
+              disabled={verifying || resetting}
+              onClick={() => setResetSheetOpen(true)}
+            >
+              {t.settings.pinForgotButton}
+            </Button>
+          </div>
+        ) : null}
       </div>
+
+      {onResetAllData ? (
+        <BottomSheet
+          open={resetSheetOpen}
+          title={t.settings.pinForgotTitle}
+          onClose={() => {
+            if (!resetting) setResetSheetOpen(false);
+          }}
+          closeLabel={t.common.close}
+          footer={
+            <div className="flex gap-3">
+              <Button
+                variant="ghost"
+                fullWidth
+                disabled={resetting}
+                onClick={() => setResetSheetOpen(false)}
+              >
+                {t.common.cancel}
+              </Button>
+              <Button
+                variant="danger"
+                fullWidth
+                disabled={resetting}
+                onClick={() => void handleConfirmReset()}
+              >
+                {t.settings.pinForgotConfirmAction}
+              </Button>
+            </div>
+          }
+        >
+          <p className="text-[0.9375rem] leading-relaxed text-ink-secondary">
+            {t.settings.pinForgotBody}
+          </p>
+        </BottomSheet>
+      ) : null}
     </AppShell>
   );
 }

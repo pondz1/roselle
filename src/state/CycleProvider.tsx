@@ -78,7 +78,32 @@ interface CycleProviderProps {
 
 export function CycleProvider({ repository, todayOverride, children }: CycleProviderProps) {
   const repo = useMemo(() => repository ?? getDefaultRepository(), [repository]);
-  const today = todayOverride ?? todayISO();
+  const [currentToday, setCurrentToday] = useState<ISODate>(() => todayISO());
+  const today = todayOverride ?? currentToday;
+
+  useEffect(() => {
+    if (todayOverride || typeof window === 'undefined' || typeof document === 'undefined') {
+      return undefined;
+    }
+
+    const syncToday = () => {
+      const next = todayISO();
+      setCurrentToday((prev) => (prev === next ? prev : next));
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        syncToday();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', syncToday);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', syncToday);
+    };
+  }, [todayOverride]);
 
   const [loading, setLoading] = useState(true);
   const [storageError, setStorageError] = useState(false);
@@ -139,11 +164,12 @@ export function CycleProvider({ repository, todayOverride, children }: CycleProv
 
   const saveLog = useCallback(
     async (input: DailyLogInput) => {
+      if (compareDates(input.date, today) > 0) return;
       await repo.upsertLog(input);
       const nextLogs = await repo.getAllLogs();
       setLogs(nextLogs);
     },
-    [repo],
+    [repo, today],
   );
 
   const toggleTodayPeriod = useCallback(async () => {
@@ -151,6 +177,7 @@ export function CycleProvider({ repository, todayOverride, children }: CycleProv
     await repo.upsertLog({
       date: today,
       flow: existing && existing.flow !== 'none' ? existing.flow : 'medium',
+      periodEnded: existing?.periodEnded ?? false,
       symptoms: existing?.symptoms ?? [],
       moods: existing?.moods ?? [],
       activities: existing?.activities ?? [],
@@ -169,6 +196,7 @@ export function CycleProvider({ repository, todayOverride, children }: CycleProv
     await repo.upsertLog({
       date: today,
       flow: 'none',
+      periodEnded: false,
       symptoms: existing.symptoms,
       moods: existing.moods,
       activities: existing.activities,

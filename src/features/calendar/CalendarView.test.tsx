@@ -162,4 +162,33 @@ describe('CalendarView', () => {
     expect(screen.getByRole('button', { name: 'Marked as period start' })).toBeEnabled();
     await db.delete();
   });
+
+  it('clears stale periodEnded flag on earlier day when extending episode in bulk edit mode', async () => {
+    const db = new RoselleDatabase(`CalBulkExtend_${Math.random().toString(36).slice(2)}`);
+    const repo = new DexieCycleRepository(db);
+    await repo.updateSettings({ onboardingCompleted: true, locale: 'en' });
+    await repo.bulkSetPeriodDays([
+      { date: '2026-11-10', flow: 'medium', periodEnded: false },
+      { date: '2026-11-11', flow: 'medium', periodEnded: true },
+    ]);
+    const user = userEvent.setup();
+
+    render(
+      <CycleProvider repository={repo} todayOverride="2026-11-19">
+        <Harness onSelectDate={() => {}} />
+      </CycleProvider>,
+    );
+
+    await user.click(await screen.findByRole('button', { name: 'Edit Period Days' }));
+    await user.click(screen.getByTestId('cal-day-2026-11-12'));
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+
+    await waitFor(async () => {
+      const nov11 = await repo.getLogByDate('2026-11-11');
+      const nov12 = await repo.getLogByDate('2026-11-12');
+      expect(nov11?.periodEnded).toBe(false);
+      expect(nov12?.flow).toBe('medium');
+    });
+    await db.delete();
+  });
 });

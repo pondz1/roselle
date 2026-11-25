@@ -16,14 +16,17 @@ import { TodayView } from './features/today/TodayView';
 import { I18nProvider, useI18n } from './i18n/I18nProvider';
 import { CycleProvider, useCycle } from './state/CycleProvider';
 
+const AUTO_LOCK_HIDDEN_MS = 2 * 60 * 1000;
+
 function AppContent() {
-  const { loading, storageError, settings } = useCycle();
+  const { loading, storageError, settings, resetAllData } = useCycle();
   const { t } = useI18n();
 
   const [activeTab, setActiveTab] = useState<TabId>('today');
   const [logSheetDate, setLogSheetDate] = useState<ISODate | null>(null);
   const [isLocked, setIsLocked] = useState(false);
   const lockInitializedRef = useRef(false);
+  const hiddenAtRef = useRef<number | null>(null);
 
   const hasPin = Boolean(settings.pinHash && settings.pinSalt);
 
@@ -40,6 +43,32 @@ function AppContent() {
       setIsLocked(false);
     }
   }, [hasPin, loading]);
+
+  useEffect(() => {
+    if (!hasPin || typeof document === 'undefined') {
+      hiddenAtRef.current = null;
+      return undefined;
+    }
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        hiddenAtRef.current = Date.now();
+      } else if (document.visibilityState === 'visible') {
+        if (
+          hiddenAtRef.current !== null &&
+          Date.now() - hiddenAtRef.current >= AUTO_LOCK_HIDDEN_MS
+        ) {
+          setIsLocked(true);
+        }
+        hiddenAtRef.current = null;
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [hasPin]);
 
   if (loading) {
     return (
@@ -80,6 +109,7 @@ function AppContent() {
         pinHash={settings.pinHash}
         pinSalt={settings.pinSalt}
         onUnlock={() => setIsLocked(false)}
+        onResetAllData={resetAllData}
       />
     );
   }

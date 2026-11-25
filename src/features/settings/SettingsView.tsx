@@ -69,7 +69,7 @@ export function SettingsView({ onLockNow }: SettingsViewProps = {}) {
           <StepperRow
             label={t.settings.defaultCycleLength}
             value={settings.defaultCycleLength}
-            min={18}
+            min={Math.max(18, settings.defaultPeriodLength + settings.lutealPhaseLength + 1)}
             max={45}
             unit={t.common.dayShort}
             onChange={(v) => void updateSettings({ defaultCycleLength: v })}
@@ -78,7 +78,7 @@ export function SettingsView({ onLockNow }: SettingsViewProps = {}) {
             label={t.settings.defaultPeriodLength}
             value={settings.defaultPeriodLength}
             min={2}
-            max={10}
+            max={Math.min(10, settings.defaultCycleLength - settings.lutealPhaseLength - 1)}
             unit={t.common.dayShort}
             onChange={(v) => void updateSettings({ defaultPeriodLength: v })}
           />
@@ -86,7 +86,7 @@ export function SettingsView({ onLockNow }: SettingsViewProps = {}) {
             label={t.settings.lutealPhaseLength}
             value={settings.lutealPhaseLength}
             min={10}
-            max={16}
+            max={Math.min(16, settings.defaultCycleLength - settings.defaultPeriodLength - 1)}
             unit={t.common.dayShort}
             onChange={(v) => void updateSettings({ lutealPhaseLength: v })}
           />

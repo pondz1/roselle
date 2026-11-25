@@ -178,4 +178,72 @@ describe('TodayView', () => {
     expect(endedLog?.periodEnded).toBe(true);
     await db.delete();
   });
+
+  it('shows semi-auto Day 6+ check-in to either confirm period ended or extend continuously without splitting', async () => {
+    const db = new RoselleDatabase(`TodayCheckIn_${Math.random().toString(36).slice(2)}`);
+    const repo = new DexieCycleRepository(db);
+    await repo.updateSettings({ onboardingCompleted: true, defaultPeriodLength: 5 });
+    await repo.upsertLog({
+      date: '2026-11-18',
+      flow: 'medium',
+      symptoms: [],
+      moods: [],
+      activities: [],
+      note: '',
+    });
+    const user = userEvent.setup();
+
+    const firstRender = render(
+      <CycleProvider repository={repo} todayOverride="2026-11-23">
+        <Harness onOpenLog={() => {}} />
+      </CycleProvider>,
+    );
+
+    expect(await screen.findByText('ประจำเดือนรอบนี้หมดแล้วหรือยัง?')).toBeInTheDocument();
+    expect(screen.getByText(/ผ่านมา 5 วันแล้ว/)).toBeInTheDocument();
+
+    // Choosing "Still ongoing" extends continuously from Nov 18 to Nov 23 (Day 6, NOT Day 1)
+    await user.click(screen.getByRole('button', { name: 'ยังมีอยู่' }));
+    expect(await screen.findByText('ประจำเดือนวันที่ 6')).toBeInTheDocument();
+    expect(screen.queryByText('ประจำเดือนรอบนี้หมดแล้วหรือยัง?')).not.toBeInTheDocument();
+    const logsAfterExtend = await repo.getAllLogs();
+    expect(logsAfterExtend.map((l) => l.date)).toEqual([
+      '2026-11-18',
+      '2026-11-19',
+      '2026-11-20',
+      '2026-11-21',
+      '2026-11-22',
+      '2026-11-23',
+    ]);
+    firstRender.unmount();
+
+    // Fresh scenario: choosing "Yes, ended" on Day 6 marks Day 5 (Nov 22) as periodEnded=true
+    const db2 = new RoselleDatabase(`TodayCheckInEnd_${Math.random().toString(36).slice(2)}`);
+    const repo2 = new DexieCycleRepository(db2);
+    await repo2.updateSettings({ onboardingCompleted: true, defaultPeriodLength: 5 });
+    await repo2.upsertLog({
+      date: '2026-11-18',
+      flow: 'medium',
+      symptoms: [],
+      moods: [],
+      activities: [],
+      note: '',
+    });
+
+    render(
+      <CycleProvider repository={repo2} todayOverride="2026-11-23">
+        <Harness onOpenLog={() => {}} />
+      </CycleProvider>,
+    );
+
+    await user.click(await screen.findByRole('button', { name: 'หมดแล้ว' }));
+    await waitFor(() =>
+      expect(screen.queryByText('ประจำเดือนรอบนี้หมดแล้วหรือยัง?')).not.toBeInTheDocument(),
+    );
+    const day5Log = await repo2.getLogByDate('2026-11-22');
+    expect(day5Log?.periodEnded).toBe(true);
+
+    await db.delete();
+    await db2.delete();
+  });
 });

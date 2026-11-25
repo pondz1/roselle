@@ -92,6 +92,10 @@ export interface TranslationDict {
     clearPeriodToday: string;
     endPeriodToday: string;
     periodEndedToday: string;
+    periodCheckInTitle: string;
+    periodCheckInBody: (days: number) => string;
+    periodCheckInYesEnded: string;
+    periodCheckInStillGoing: string;
     nextPeriodLabel: string;
     ovulationDateLabel: string;
     todayLogHeading: string;
@@ -138,6 +142,7 @@ export interface TranslationDict {
       periodStartButton: string;
       periodStartActive: string;
       periodEndButton: string;
+      periodStillGoingButton: string;
       periodEndActive: string;
       periodStartStatus: string;
       periodOngoingStatus: string;
@@ -363,6 +368,11 @@ export const translations: Record<Locale, TranslationDict> = {
       clearPeriodToday: 'ยกเลิกวันประจำเดือนวันนี้',
       endPeriodToday: 'ประจำเดือนหมดวันนี้',
       periodEndedToday: 'บันทึกว่าประจำเดือนหมดวันนี้แล้ว',
+      periodCheckInTitle: 'ประจำเดือนรอบนี้หมดแล้วหรือยัง?',
+      periodCheckInBody: (days) =>
+        `ผ่านมา ${days} วันแล้ว ยืนยันเพื่อปรับการคาดการณ์ให้แม่นยำขึ้น`,
+      periodCheckInYesEnded: 'หมดแล้ว',
+      periodCheckInStillGoing: 'ยังมีอยู่',
       nextPeriodLabel: 'รอบถัดไป (คาดการณ์)',
       ovulationDateLabel: 'วันไข่ตก (คาดการณ์)',
       todayLogHeading: 'บันทึกของวันนี้',
@@ -438,6 +448,7 @@ export const translations: Record<Locale, TranslationDict> = {
         periodStartButton: 'ประจำเดือนเริ่มวันนี้',
         periodStartActive: 'เริ่มประจำเดือนวันนี้แล้ว',
         periodEndButton: 'ประจำเดือนหมดวันนี้',
+        periodStillGoingButton: 'ยังมีประจำเดือนวันนี้',
         periodEndActive: 'บันทึกว่าหมดวันนี้แล้ว',
         periodStartStatus: 'บันทึกเป็นวันเริ่มรอบแล้ว',
         periodOngoingStatus: 'อยู่ในช่วงประจำเดือน',
@@ -697,6 +708,11 @@ export const translations: Record<Locale, TranslationDict> = {
       clearPeriodToday: 'Clear Period Today',
       endPeriodToday: 'Period ended today',
       periodEndedToday: 'Marked period ended today',
+      periodCheckInTitle: 'Has your period ended?',
+      periodCheckInBody: (days) =>
+        `It has been ${days} days. Confirm to keep predictions accurate.`,
+      periodCheckInYesEnded: 'Yes, ended',
+      periodCheckInStillGoing: 'Still ongoing',
       nextPeriodLabel: 'Next period (est.)',
       ovulationDateLabel: 'Ovulation (est.)',
       todayLogHeading: "Today's Log",
@@ -772,6 +788,7 @@ export const translations: Record<Locale, TranslationDict> = {
         periodStartButton: 'Period started',
         periodStartActive: 'Marked as period start',
         periodEndButton: 'Period ended',
+        periodStillGoingButton: 'Still on period',
         periodEndActive: 'Marked as period end',
         periodStartStatus: 'Marked as period start',
         periodOngoingStatus: 'Ongoing period',

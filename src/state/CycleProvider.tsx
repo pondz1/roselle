@@ -51,6 +51,7 @@ interface CycleContextValue {
   clearTodayPeriod: () => Promise<void>;
   markPeriodStart: (date: ISODate) => Promise<void>;
   markPeriodEnd: (date: ISODate) => Promise<void>;
+  extendPeriodToDate: (date: ISODate) => Promise<void>;
   clearPeriodDay: (date: ISODate) => Promise<void>;
   clearPeriodEpisode: (startDate: ISODate) => Promise<void>;
   bulkSetPeriodDays: (updates: PeriodDayUpdate[]) => Promise<void>;
@@ -173,7 +174,52 @@ export function CycleProvider({ repository, todayOverride, children }: CycleProv
     [repo, today],
   );
 
+  const extendPeriodToDate = useCallback(
+    async (date: ISODate) => {
+      if (compareDates(date, today) > 0) return;
+      const matching = [...episodes]
+        .reverse()
+        .find((ep) => {
+          const offset = diffDays(ep.startDate, date);
+          return offset >= 0 && offset <= 12;
+        });
+
+      const updates: PeriodDayUpdate[] = [];
+      if (matching) {
+        const span = diffDays(matching.startDate, date);
+        for (let i = 0; i <= span; i += 1) {
+          const d = addDays(matching.startDate, i);
+          const existing = logsByDate.get(d);
+          const flow: FlowLevel =
+            existing && existing.flow !== 'none' ? existing.flow : 'medium';
+          updates.push({ date: d, flow, periodEnded: false });
+        }
+      } else {
+        const existing = logsByDate.get(date);
+        const flow: FlowLevel =
+          existing && existing.flow !== 'none' ? existing.flow : 'medium';
+        updates.push({ date, flow, periodEnded: false });
+      }
+
+      await repo.bulkSetPeriodDays(updates);
+      const nextLogs = await repo.getAllLogs();
+      setLogs(nextLogs);
+    },
+    [episodes, logsByDate, repo, today],
+  );
+
   const toggleTodayPeriod = useCallback(async () => {
+    const recentOngoing = [...episodes]
+      .reverse()
+      .find((ep) => {
+        const offset = diffDays(ep.startDate, today);
+        return offset > 0 && offset <= 12;
+      });
+    if (recentOngoing) {
+      await extendPeriodToDate(today);
+      return;
+    }
+
     const existing = logsByDate.get(today);
     await repo.upsertLog({
       date: today,
@@ -189,7 +235,7 @@ export function CycleProvider({ repository, todayOverride, children }: CycleProv
     });
     const nextLogs = await repo.getAllLogs();
     setLogs(nextLogs);
-  }, [logsByDate, repo, today]);
+  }, [episodes, extendPeriodToDate, logsByDate, repo, today]);
 
   const clearTodayPeriod = useCallback(async () => {
     const existing = logsByDate.get(today);
@@ -370,6 +416,7 @@ export function CycleProvider({ repository, todayOverride, children }: CycleProv
       clearTodayPeriod,
       markPeriodStart,
       markPeriodEnd,
+      extendPeriodToDate,
       clearPeriodDay,
       clearPeriodEpisode,
       bulkSetPeriodDays,
@@ -395,6 +442,7 @@ export function CycleProvider({ repository, todayOverride, children }: CycleProv
       clearTodayPeriod,
       markPeriodStart,
       markPeriodEnd,
+      extendPeriodToDate,
       clearPeriodDay,
       clearPeriodEpisode,
       bulkSetPeriodDays,

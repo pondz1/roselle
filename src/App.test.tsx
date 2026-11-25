@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { RoselleDatabase } from './data/db';
 import { DexieCycleRepository } from './data/dexie-repository';
@@ -163,5 +163,70 @@ describe('App full integration', () => {
 
     landingMount.unmount();
     await db.delete();
+  });
+
+  it('allows resetting forgotten PIN on lock screen and auto-locks after backgrounding', async () => {
+    const db = new RoselleDatabase(`AppPinRecovery_${Math.random().toString(36).slice(2)}`);
+    const repo = new DexieCycleRepository(db);
+    const nowSpy = vi.spyOn(Date, 'now');
+    let fakeNow = 1_000_000;
+    nowSpy.mockImplementation(() => fakeNow);
+
+    try {
+      await repo.updateSettings({ onboardingCompleted: true, locale: 'th' });
+      const user = userEvent.setup();
+
+      // 1. Set PIN (1357) in Settings
+      const firstMount = render(
+        <App repository={repo} todayOverride="2026-11-19" initialPath="/app" />,
+      );
+      await user.click(await screen.findByRole('button', { name: 'ตั้งค่า' }));
+      await user.click(await screen.findByRole('button', { name: 'ตั้งรหัส PIN 4 หลัก' }));
+      for (const d of ['1', '3', '5', '7']) {
+        await user.click(screen.getByRole('button', { name: d }));
+      }
+      await screen.findByText('ยืนยันรหัส PIN อีกครั้ง');
+      for (const d of ['1', '3', '5', '7']) {
+        await user.click(screen.getByRole('button', { name: d }));
+      }
+      await screen.findByText('บันทึกรหัส PIN เรียบร้อยแล้ว');
+
+      // 2. Simulate backgrounding tab for > 2 minutes -> auto-locks on return
+      Object.defineProperty(document, 'visibilityState', {
+        value: 'hidden',
+        configurable: true,
+      });
+      act(() => {
+        document.dispatchEvent(new Event('visibilitychange'));
+      });
+
+      fakeNow += 130_000;
+      Object.defineProperty(document, 'visibilityState', {
+        value: 'visible',
+        configurable: true,
+      });
+      act(() => {
+        document.dispatchEvent(new Event('visibilitychange'));
+      });
+
+      expect(await screen.findByText('ใส่รหัส PIN เพื่อเปิด Roselle')).toBeInTheDocument();
+
+      // 3. Forgot PIN -> erase all local data & return to unlocked onboarding
+      await user.click(screen.getByRole('button', { name: 'ลืมรหัส PIN?' }));
+      expect(await screen.findByText('ล้างข้อมูลเพื่อปลดล็อกแอป')).toBeInTheDocument();
+      await user.click(screen.getByRole('button', { name: 'ล้างข้อมูลทั้งหมดและปลดล็อก' }));
+
+      await waitFor(() =>
+        expect(screen.getByText('เริ่มติดตามรอบเดือนของคุณ')).toBeInTheDocument(),
+      );
+      firstMount.unmount();
+    } finally {
+      Object.defineProperty(document, 'visibilityState', {
+        value: 'visible',
+        configurable: true,
+      });
+      nowSpy.mockRestore();
+      await db.delete();
+    }
   });
 });

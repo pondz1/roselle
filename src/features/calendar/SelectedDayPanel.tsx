@@ -19,7 +19,7 @@ export function SelectedDayPanel({ date, onOpenDetails }: SelectedDayPanelProps)
     calendarMap,
     markPeriodStart,
     markPeriodEnd,
-    clearPeriodDay,
+    clearPeriodEpisode,
     bulkSetPeriodDays,
   } = useCycle();
   const { locale, t } = useI18n();
@@ -37,7 +37,6 @@ export function SelectedDayPanel({ date, onOpenDetails }: SelectedDayPanelProps)
 
   const isEpisodeStart = Boolean(matchingEpisode && matchingEpisode.startDate === date);
   const isMarkedEnded = Boolean(log && log.flow !== 'none' && log.periodEnded === true);
-  const canMarkEnd = Boolean(matchingEpisode);
 
   let phaseLabel: string | null = null;
   let phaseClass = 'bg-tinted-subtle text-ink-secondary';
@@ -66,20 +65,9 @@ export function SelectedDayPanel({ date, onOpenDetails }: SelectedDayPanelProps)
       log!.bbtCelsius != null ||
       log!.pillTaken === true);
 
-  const handleToggleStart = async () => {
-    if (isEpisodeStart && matchingEpisode && matchingEpisode.loggedDays.length === 1) {
-      await clearPeriodDay(date);
-      return;
-    }
-    await markPeriodStart(date);
-  };
-
-  const handleToggleEnd = async () => {
-    if (isMarkedEnded && log) {
-      await bulkSetPeriodDays([{ date, flow: log.flow, periodEnded: false }]);
-      return;
-    }
-    await markPeriodEnd(date);
+  const handleUndoEnd = async () => {
+    if (!isMarkedEnded || !log) return;
+    await bulkSetPeriodDays([{ date, flow: log.flow, periodEnded: false }]);
   };
 
   return (
@@ -123,56 +111,72 @@ export function SelectedDayPanel({ date, onOpenDetails }: SelectedDayPanelProps)
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              type="button"
-              aria-pressed={isEpisodeStart}
-              onClick={() => void handleToggleStart()}
-              className={[
-                'flex items-center justify-center gap-2 min-h-11 px-3 py-2 rounded-[10px]',
-                'text-[0.8125rem] font-medium border-[1.5px] transition-[background-color,color,border-color,transform] duration-[150ms] active:scale-[0.98]',
-                isEpisodeStart
-                  ? 'bg-coral-rose text-warm-surface border-coral-rose'
-                  : 'bg-coral-rose-soft/80 text-coral-rose-ink border-transparent hover:bg-coral-rose-soft',
-              ].join(' ')}
-            >
-              {isEpisodeStart ? (
-                <Check className="w-4 h-4 shrink-0" strokeWidth={1.6} />
-              ) : (
+          <div className="space-y-2.5">
+            {!matchingEpisode ? (
+              <button
+                type="button"
+                onClick={() => void markPeriodStart(date)}
+                className="w-full flex items-center justify-center gap-2 min-h-11 px-4 py-2 rounded-[10px] text-[0.875rem] font-medium bg-coral-rose-soft/80 text-coral-rose-ink hover:bg-coral-rose-soft transition-[background-color,transform] duration-[150ms] active:scale-[0.98]"
+              >
                 <Droplets className="w-4 h-4 shrink-0" strokeWidth={1.6} />
-              )}
-              <span className="truncate">
-                {isEpisodeStart
-                  ? t.calendar.selectedDay.periodStartActive
-                  : t.calendar.selectedDay.periodStartButton}
-              </span>
-            </button>
+                <span>{t.calendar.selectedDay.periodStartButton}</span>
+              </button>
+            ) : (
+              <>
+                {isEpisodeStart ? (
+                  <div className="flex items-center justify-between gap-2 rounded-[10px] bg-coral-rose-soft/80 px-3.5 py-2.5 text-[0.8125rem] text-coral-rose-ink">
+                    <span className="flex items-center gap-2 font-medium min-w-0">
+                      <Check className="w-4 h-4 shrink-0" strokeWidth={1.6} />
+                      <span className="truncate">{t.calendar.selectedDay.periodStartStatus}</span>
+                    </span>
+                    <button
+                      type="button"
+                      aria-label={t.calendar.selectedDay.undoStartAria}
+                      onClick={() => void clearPeriodEpisode(matchingEpisode.startDate)}
+                      className="shrink-0 font-semibold underline underline-offset-2 hover:text-coral-rose-hover px-1 py-0.5 rounded-[6px] transition-colors"
+                    >
+                      {t.calendar.selectedDay.undoAction}
+                    </button>
+                  </div>
+                ) : !isMarkedEnded ? (
+                  <div className="flex items-center gap-2 rounded-[10px] bg-tinted-subtle px-3.5 py-2.5 text-[0.8125rem] text-ink-secondary">
+                    <Droplets className="w-4 h-4 shrink-0 text-coral-rose-ink" strokeWidth={1.6} />
+                    <span>{t.calendar.selectedDay.periodOngoingStatus}</span>
+                  </div>
+                ) : null}
 
-            <button
-              type="button"
-              aria-pressed={isMarkedEnded}
-              disabled={!canMarkEnd}
-              onClick={() => void handleToggleEnd()}
-              className={[
-                'flex items-center justify-center gap-2 min-h-11 px-3 py-2 rounded-[10px]',
-                'text-[0.8125rem] font-medium border-[1.5px] transition-[background-color,color,border-color,transform] duration-[150ms] active:scale-[0.98]',
-                'disabled:opacity-40 disabled:pointer-events-none',
-                isMarkedEnded
-                  ? 'bg-coral-rose text-warm-surface border-coral-rose'
-                  : 'bg-tinted-subtle text-ink-primary border-transparent hover:border-rose-hairline',
-              ].join(' ')}
-            >
-              {isMarkedEnded ? (
-                <Check className="w-4 h-4 shrink-0" strokeWidth={1.6} />
-              ) : (
-                <SquareCheck className="w-4 h-4 shrink-0" strokeWidth={1.6} />
-              )}
-              <span className="truncate">
-                {isMarkedEnded
-                  ? t.calendar.selectedDay.periodEndActive
-                  : t.calendar.selectedDay.periodEndButton}
-              </span>
-            </button>
+                {isMarkedEnded ? (
+                  <div className="flex items-center justify-between gap-2 rounded-[10px] bg-coral-rose-soft/80 px-3.5 py-2.5 text-[0.8125rem] text-coral-rose-ink">
+                    <span className="flex items-center gap-2 font-medium min-w-0">
+                      <Check className="w-4 h-4 shrink-0" strokeWidth={1.6} />
+                      <span className="truncate">{t.calendar.selectedDay.periodEndStatus}</span>
+                    </span>
+                    <button
+                      type="button"
+                      aria-label={t.calendar.selectedDay.undoEndAria}
+                      onClick={() => void handleUndoEnd()}
+                      className="shrink-0 font-semibold underline underline-offset-2 hover:text-coral-rose-hover px-1 py-0.5 rounded-[6px] transition-colors"
+                    >
+                      {t.calendar.selectedDay.undoAction}
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => void markPeriodEnd(date)}
+                    className={[
+                      'w-full flex items-center justify-center gap-2 min-h-11 px-4 py-2 rounded-[10px] text-[0.875rem] font-medium transition-[background-color,color,transform] duration-[150ms] active:scale-[0.98]',
+                      isEpisodeStart
+                        ? 'bg-tinted-subtle text-ink-primary hover:bg-tinted-subtle/70'
+                        : 'bg-coral-rose-soft/80 text-coral-rose-ink hover:bg-coral-rose-soft',
+                    ].join(' ')}
+                  >
+                    <SquareCheck className="w-4 h-4 shrink-0" strokeWidth={1.6} />
+                    <span>{t.calendar.selectedDay.periodEndButton}</span>
+                  </button>
+                )}
+              </>
+            )}
           </div>
 
           {matchingEpisode && !matchingEpisode.isExplicitlyEnded ? (

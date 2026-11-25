@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { CalendarDays, Droplets, Repeat } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
+import { compareDates, isValidISODate } from '../../domain/date-utils';
 import { useI18n } from '../../i18n/I18nProvider';
 import { useCycle } from '../../state/CycleProvider';
 
@@ -14,6 +15,11 @@ export function OnboardingFlow() {
   const [periodLength, setPeriodLength] = useState<number>(settings.defaultPeriodLength);
   const [cycleLength, setCycleLength] = useState<number>(settings.defaultCycleLength);
   const [submitting, setSubmitting] = useState(false);
+
+  const trimmedDate = lastPeriodStart.trim();
+  const isInvalidDate = Boolean(
+    trimmedDate && (!isValidISODate(trimmedDate) || compareDates(trimmedDate, today) > 0),
+  );
 
   const handleSkip = async () => {
     setSubmitting(true);
@@ -140,6 +146,14 @@ export function OnboardingFlow() {
                 <p className="mt-2 text-[0.8125rem] text-ink-muted">
                   {t.onboarding.lastPeriodHint}
                 </p>
+                {isInvalidDate ? (
+                  <p
+                    role="alert"
+                    className="mt-2 text-[0.8125rem] font-medium text-danger-ink"
+                  >
+                    {t.onboarding.futureDateError}
+                  </p>
+                ) : null}
               </div>
             </div>
           ) : null}
@@ -230,7 +244,12 @@ export function OnboardingFlow() {
         <footer className="flex flex-col gap-2.5">
           {step === 1 ? (
             <>
-              <Button fullWidth size="lg" onClick={() => setStep(2)} disabled={submitting}>
+              <Button
+                fullWidth
+                size="lg"
+                onClick={() => setStep(2)}
+                disabled={submitting || isInvalidDate}
+              >
                 {t.common.next}
               </Button>
               <Button fullWidth variant="ghost" onClick={handleSkip} disabled={submitting}>

@@ -98,11 +98,13 @@ export function DailyLogSheet({ date, open, onClose }: DailyLogSheetProps) {
       parsedBbt = Math.round(value * 100) / 100;
     }
 
+    const existingLog = logsByDate.get(date);
     setSaving(true);
     try {
       await saveLog({
         date,
         flow,
+        periodEnded: flow !== 'none' ? Boolean(existingLog?.periodEnded) : false,
         symptoms,
         moods,
         activities,

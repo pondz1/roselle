@@ -41,6 +41,7 @@ export interface TranslationDict {
     lastPeriodLabel: string;
     lastPeriodPlaceholder: string;
     lastPeriodHint: string;
+    futureDateError: string;
     periodLengthTitle: string;
     periodLengthBody: string;
     cycleLengthTitle: string;
@@ -89,6 +90,8 @@ export interface TranslationDict {
     logPeriodToday: string;
     editTodayLog: string;
     clearPeriodToday: string;
+    endPeriodToday: string;
+    periodEndedToday: string;
     nextPeriodLabel: string;
     ovulationDateLabel: string;
     todayLogHeading: string;
@@ -136,6 +139,12 @@ export interface TranslationDict {
       periodStartActive: string;
       periodEndButton: string;
       periodEndActive: string;
+      periodStartStatus: string;
+      periodOngoingStatus: string;
+      periodEndStatus: string;
+      undoAction: string;
+      undoStartAria: string;
+      undoEndAria: string;
       openDetails: string;
       editDetails: string;
       autoEndHint: (days: number) => string;
@@ -228,6 +237,10 @@ export interface TranslationDict {
     pinUnlockTitle: string;
     pinUnlockSubtitle: string;
     pinDeleteDigit: string;
+    pinForgotButton: string;
+    pinForgotTitle: string;
+    pinForgotBody: string;
+    pinForgotConfirmAction: string;
     backupTitle: string;
     backupDescription: string;
     exportButton: string;
@@ -280,6 +293,7 @@ export const translations: Record<Locale, TranslationDict> = {
       lastPeriodLabel: 'วันแรกของประจำเดือนครั้งล่าสุด',
       lastPeriodPlaceholder: 'เลือกวันที่ (ไม่บังคับ)',
       lastPeriodHint: 'เลือกวันที่เริ่มมา หรือกดข้ามเพื่อบันทึกภายหลังได้',
+      futureDateError: 'วันที่ต้องไม่เกินวันปัจจุบัน',
       periodLengthTitle: 'ประจำเดือนของคุณมักมากี่วัน',
       periodLengthBody: 'ค่ามาตรฐานคือ 5 วัน แอปจะปรับตามสถิติจริงเมื่อคุณบันทึกมากขึ้น',
       cycleLengthTitle: 'ความยาวรอบเดือนปกติของคุณ',
@@ -347,6 +361,8 @@ export const translations: Record<Locale, TranslationDict> = {
       logPeriodToday: 'บันทึกประจำเดือนวันนี้',
       editTodayLog: 'แก้ไขบันทึกวันนี้',
       clearPeriodToday: 'ยกเลิกวันประจำเดือนวันนี้',
+      endPeriodToday: 'ประจำเดือนหมดวันนี้',
+      periodEndedToday: 'บันทึกว่าประจำเดือนหมดวันนี้แล้ว',
       nextPeriodLabel: 'รอบถัดไป (คาดการณ์)',
       ovulationDateLabel: 'วันไข่ตก (คาดการณ์)',
       todayLogHeading: 'บันทึกของวันนี้',
@@ -423,6 +439,12 @@ export const translations: Record<Locale, TranslationDict> = {
         periodStartActive: 'เริ่มประจำเดือนวันนี้แล้ว',
         periodEndButton: 'ประจำเดือนหมดวันนี้',
         periodEndActive: 'บันทึกว่าหมดวันนี้แล้ว',
+        periodStartStatus: 'บันทึกเป็นวันเริ่มรอบแล้ว',
+        periodOngoingStatus: 'อยู่ในช่วงประจำเดือน',
+        periodEndStatus: 'บันทึกว่าหมดวันนี้แล้ว',
+        undoAction: 'ยกเลิก',
+        undoStartAria: 'ยกเลิกวันเริ่มประจำเดือน',
+        undoEndAria: 'ยกเลิกวันหมดประจำเดือน',
         openDetails: 'บันทึกอาการและอารมณ์',
         editDetails: 'แก้ไขบันทึกของวันนี้',
         autoEndHint: (days) => `หากไม่ได้กดหยุด ระบบจะจบรอบอัตโนมัติใน ${days} วันตามค่าตั้งค่า`,
@@ -543,6 +565,11 @@ export const translations: Record<Locale, TranslationDict> = {
       pinUnlockTitle: 'ใส่รหัส PIN เพื่อเปิด Roselle',
       pinUnlockSubtitle: 'รหัสของคุณถูกเก็บแบบเข้ารหัสบนเครื่องนี้เท่านั้น',
       pinDeleteDigit: 'ลบตัวเลข',
+      pinForgotButton: 'ลืมรหัส PIN?',
+      pinForgotTitle: 'ล้างข้อมูลเพื่อปลดล็อกแอป',
+      pinForgotBody:
+        'หากลืมรหัส PIN ระบบไม่สามารถกู้คืนรหัสเดิมได้ คุณสามารถล้างประวัติรอบเดือน บันทึกรายวัน และรหัส PIN ทั้งหมดบนเครื่องนี้เพื่อเริ่มใช้งานใหม่',
+      pinForgotConfirmAction: 'ล้างข้อมูลทั้งหมดและปลดล็อก',
       backupTitle: 'สำรองและกู้คืนข้อมูล',
       backupDescription: 'ส่งออกข้อมูลเป็นไฟล์ JSON เพื่อเก็บสำรอง หรือกู้คืนลงเครื่องนี้',
       exportButton: 'ส่งออก JSON',
@@ -600,6 +627,7 @@ export const translations: Record<Locale, TranslationDict> = {
       lastPeriodLabel: 'First day of your last period',
       lastPeriodPlaceholder: 'Select date (optional)',
       lastPeriodHint: 'Pick a start date or skip to log later.',
+      futureDateError: 'Date cannot be in the future.',
       periodLengthTitle: 'How long does your period usually last?',
       periodLengthBody: 'Typical length is 5 days. Predictions adapt as you log more cycles.',
       cycleLengthTitle: 'How long is your typical cycle?',
@@ -667,6 +695,8 @@ export const translations: Record<Locale, TranslationDict> = {
       logPeriodToday: 'Log Period Today',
       editTodayLog: "Edit Today's Log",
       clearPeriodToday: 'Clear Period Today',
+      endPeriodToday: 'Period ended today',
+      periodEndedToday: 'Marked period ended today',
       nextPeriodLabel: 'Next period (est.)',
       ovulationDateLabel: 'Ovulation (est.)',
       todayLogHeading: "Today's Log",
@@ -743,6 +773,12 @@ export const translations: Record<Locale, TranslationDict> = {
         periodStartActive: 'Marked as period start',
         periodEndButton: 'Period ended',
         periodEndActive: 'Marked as period end',
+        periodStartStatus: 'Marked as period start',
+        periodOngoingStatus: 'Ongoing period',
+        periodEndStatus: 'Marked as period end',
+        undoAction: 'Undo',
+        undoStartAria: 'Undo period start',
+        undoEndAria: 'Undo period end',
         openDetails: 'Log symptoms & mood',
         editDetails: 'Edit daily log',
         autoEndHint: (days) => `Auto-ends after ${days} days based on your cycle defaults if unmarked`,
@@ -863,6 +899,11 @@ export const translations: Record<Locale, TranslationDict> = {
       pinUnlockTitle: 'Enter PIN to unlock Roselle',
       pinUnlockSubtitle: 'Your PIN is verified locally on this device.',
       pinDeleteDigit: 'Delete digit',
+      pinForgotButton: 'Forgot PIN?',
+      pinForgotTitle: 'Reset data to unlock app',
+      pinForgotBody:
+        'Forgotten PINs cannot be recovered. You can permanently erase all cycle history, daily logs, and the PIN lock on this device to start fresh.',
+      pinForgotConfirmAction: 'Erase all data & unlock',
       backupTitle: 'Backup & Restore',
       backupDescription: 'Export your data as JSON for safekeeping or restore an earlier backup.',
       exportButton: 'Export JSON',

@@ -1,8 +1,15 @@
 import { useState } from 'react';
 import { CalendarPlus, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
-import { addMonths, compareDates, formatMonthYear, parseISODate } from '../../domain/date-utils';
-import type { FlowLevel, ISODate } from '../../domain/types';
+import type { PeriodDayUpdate } from '../../data/repository';
+import {
+  addMonths,
+  compareDates,
+  diffDays,
+  formatMonthYear,
+  parseISODate,
+} from '../../domain/date-utils';
+import type { ISODate } from '../../domain/types';
 import { useI18n } from '../../i18n/I18nProvider';
 import { useCycle } from '../../state/CycleProvider';
 import { CalendarLegend } from './CalendarLegend';
@@ -61,16 +68,28 @@ export function CalendarView({ onSelectDate }: CalendarViewProps) {
       const originalSet = new Set(
         logs.filter((l) => l.flow !== 'none').map((l) => l.date),
       );
-      const updates: Array<{ date: ISODate; flow: FlowLevel }> = [];
+      const updates: PeriodDayUpdate[] = [];
+      const stagedList = Array.from(stagedDates);
 
       for (const date of stagedDates) {
         if (!originalSet.has(date)) {
-          updates.push({ date, flow: 'medium' });
+          updates.push({ date, flow: 'medium', periodEnded: false });
         }
       }
       for (const date of originalSet) {
         if (!stagedDates.has(date)) {
-          updates.push({ date, flow: 'none' });
+          updates.push({ date, flow: 'none', periodEnded: false });
+        }
+      }
+      for (const log of logs) {
+        if (log.flow !== 'none' && log.periodEnded === true && stagedDates.has(log.date)) {
+          const hasLaterInEpisode = stagedList.some((d) => {
+            const offset = diffDays(log.date, d);
+            return offset > 0 && offset <= 12;
+          });
+          if (hasLaterInEpisode) {
+            updates.push({ date: log.date, flow: log.flow, periodEnded: false });
+          }
         }
       }
 

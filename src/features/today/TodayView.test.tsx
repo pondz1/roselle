@@ -145,4 +145,37 @@ describe('TodayView', () => {
     expect(screen.getByText('ทานยาคุมแล้ว')).toBeInTheDocument();
     await db.delete();
   });
+
+  it('shows Edit Log and Period Ended Today instead of Log Period Today during auto-period window', async () => {
+    const db = new RoselleDatabase(`TodayAutoPeriod_${Math.random().toString(36).slice(2)}`);
+    const repo = new DexieCycleRepository(db);
+    await repo.updateSettings({ onboardingCompleted: true, defaultPeriodLength: 5 });
+    await repo.upsertLog({
+      date: '2026-11-18',
+      flow: 'medium',
+      symptoms: [],
+      moods: [],
+      activities: [],
+      note: '',
+    });
+    const user = userEvent.setup();
+
+    render(
+      <CycleProvider repository={repo} todayOverride="2026-11-19">
+        <Harness onOpenLog={() => {}} />
+      </CycleProvider>,
+    );
+
+    expect(await screen.findByText('ประจำเดือนวันที่ 2')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'บันทึกประจำเดือนวันนี้' })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'แก้ไขบันทึกวันนี้' })).toBeInTheDocument();
+
+    const endBtn = screen.getByRole('button', { name: 'ประจำเดือนหมดวันนี้' });
+    await user.click(endBtn);
+
+    expect(await screen.findByText('บันทึกว่าประจำเดือนหมดวันนี้แล้ว')).toBeInTheDocument();
+    const endedLog = await repo.getLogByDate('2026-11-19');
+    expect(endedLog?.periodEnded).toBe(true);
+    await db.delete();
+  });
 });

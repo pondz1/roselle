@@ -52,6 +52,7 @@ interface CycleContextValue {
   markPeriodStart: (date: ISODate) => Promise<void>;
   markPeriodEnd: (date: ISODate) => Promise<void>;
   clearPeriodDay: (date: ISODate) => Promise<void>;
+  clearPeriodEpisode: (startDate: ISODate) => Promise<void>;
   bulkSetPeriodDays: (updates: PeriodDayUpdate[]) => Promise<void>;
   updateSettings: (patch: Partial<Omit<UserSettings, 'id' | 'updatedAt'>>) => Promise<void>;
   completeOnboarding: (payload: OnboardingPayload) => Promise<void>;
@@ -78,7 +79,32 @@ interface CycleProviderProps {
 
 export function CycleProvider({ repository, todayOverride, children }: CycleProviderProps) {
   const repo = useMemo(() => repository ?? getDefaultRepository(), [repository]);
-  const today = todayOverride ?? todayISO();
+  const [currentToday, setCurrentToday] = useState<ISODate>(() => todayISO());
+  const today = todayOverride ?? currentToday;
+
+  useEffect(() => {
+    if (todayOverride || typeof window === 'undefined' || typeof document === 'undefined') {
+      return undefined;
+    }
+
+    const syncToday = () => {
+      const next = todayISO();
+      setCurrentToday((prev) => (prev === next ? prev : next));
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        syncToday();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', syncToday);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', syncToday);
+    };
+  }, [todayOverride]);
 
   const [loading, setLoading] = useState(true);
   const [storageError, setStorageError] = useState(false);
@@ -139,11 +165,12 @@ export function CycleProvider({ repository, todayOverride, children }: CycleProv
 
   const saveLog = useCallback(
     async (input: DailyLogInput) => {
+      if (compareDates(input.date, today) > 0) return;
       await repo.upsertLog(input);
       const nextLogs = await repo.getAllLogs();
       setLogs(nextLogs);
     },
-    [repo],
+    [repo, today],
   );
 
   const toggleTodayPeriod = useCallback(async () => {
@@ -151,6 +178,7 @@ export function CycleProvider({ repository, todayOverride, children }: CycleProv
     await repo.upsertLog({
       date: today,
       flow: existing && existing.flow !== 'none' ? existing.flow : 'medium',
+      periodEnded: existing?.periodEnded ?? false,
       symptoms: existing?.symptoms ?? [],
       moods: existing?.moods ?? [],
       activities: existing?.activities ?? [],
@@ -169,6 +197,7 @@ export function CycleProvider({ repository, todayOverride, children }: CycleProv
     await repo.upsertLog({
       date: today,
       flow: 'none',
+      periodEnded: false,
       symptoms: existing.symptoms,
       moods: existing.moods,
       activities: existing.activities,
@@ -193,6 +222,12 @@ export function CycleProvider({ repository, todayOverride, children }: CycleProv
   const markPeriodStart = useCallback(
     async (date: ISODate) => {
       if (compareDates(date, today) > 0) return;
+      const isInsideExistingEpisode = episodes.some((ep) => {
+        const offset = diffDays(ep.startDate, date);
+        return offset > 0 && offset <= 12;
+      });
+      if (isInsideExistingEpisode) return;
+
       const updates: PeriodDayUpdate[] = [];
       for (let i = 0; i < settings.defaultPeriodLength; i += 1) {
         const d = addDays(date, i);
@@ -207,7 +242,7 @@ export function CycleProvider({ repository, todayOverride, children }: CycleProv
       const nextLogs = await repo.getAllLogs();
       setLogs(nextLogs);
     },
-    [logsByDate, repo, settings.defaultPeriodLength, today],
+    [episodes, logsByDate, repo, settings.defaultPeriodLength, today],
   );
 
   const markPeriodEnd = useCallback(
@@ -256,6 +291,19 @@ export function CycleProvider({ repository, todayOverride, children }: CycleProv
       setLogs(nextLogs);
     },
     [repo],
+  );
+
+  const clearPeriodEpisode = useCallback(
+    async (startDate: ISODate) => {
+      const target = episodes.find((ep) => ep.startDate === startDate);
+      if (!target || target.loggedDays.length === 0) return;
+      await repo.bulkSetPeriodDays(
+        target.loggedDays.map((d) => ({ date: d, flow: 'none', periodEnded: false })),
+      );
+      const nextLogs = await repo.getAllLogs();
+      setLogs(nextLogs);
+    },
+    [episodes, repo],
   );
 
   const updateSettings = useCallback(
@@ -323,6 +371,7 @@ export function CycleProvider({ repository, todayOverride, children }: CycleProv
       markPeriodStart,
       markPeriodEnd,
       clearPeriodDay,
+      clearPeriodEpisode,
       bulkSetPeriodDays,
       updateSettings,
       completeOnboarding,
@@ -347,6 +396,7 @@ export function CycleProvider({ repository, todayOverride, children }: CycleProv
       markPeriodStart,
       markPeriodEnd,
       clearPeriodDay,
+      clearPeriodEpisode,
       bulkSetPeriodDays,
       updateSettings,
       completeOnboarding,

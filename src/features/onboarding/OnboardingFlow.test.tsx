@@ -73,4 +73,24 @@ describe('OnboardingFlow', () => {
     );
     await db.delete();
   });
+
+  it('shows validation error and disables Next when future date is entered', async () => {
+    const db = new RoselleDatabase(`OnboardFuture_${Math.random().toString(36).slice(2)}`);
+    const repo = new DexieCycleRepository(db);
+    const user = userEvent.setup();
+
+    render(
+      <CycleProvider repository={repo} todayOverride="2026-11-19">
+        <Harness />
+      </CycleProvider>,
+    );
+
+    const dateInput = await screen.findByLabelText('วันแรกของประจำเดือนครั้งล่าสุด');
+    await user.clear(dateInput);
+    await user.type(dateInput, '2026-11-25');
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('วันที่ต้องไม่เกินวันปัจจุบัน');
+    expect(screen.getByRole('button', { name: 'ถัดไป' })).toBeDisabled();
+    await db.delete();
+  });
 });

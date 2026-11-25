@@ -125,7 +125,7 @@ describe('CalendarView', () => {
     await db.delete();
   });
 
-  it('disables Period started on ongoing period days while keeping Period ended enabled', async () => {
+  it('shows status rows with explicit undo and hides Period started on ongoing period days', async () => {
     const db = new RoselleDatabase(`CalGuard_${Math.random().toString(36).slice(2)}`);
     const repo = new DexieCycleRepository(db);
     await repo.updateSettings({
@@ -141,25 +141,37 @@ describe('CalendarView', () => {
       </CycleProvider>,
     );
 
-    // Start period on Nov 21
+    // Start period on Nov 21 -> shows start status row + Undo start + Period ended
     await user.click(await screen.findByTestId('cal-day-2026-11-21'));
     await user.click(screen.getByRole('button', { name: 'Period started' }));
-    await waitFor(() =>
-      expect(screen.getByRole('button', { name: 'Marked as period start' })).toBeEnabled(),
-    );
+    expect(await screen.findByText('Marked as period start')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Undo period start' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Period ended' })).toBeInTheDocument();
 
-    // Selecting Day 2 (Nov 22) or Day 3 (Nov 23) within ongoing period disables "Period started"
+    // Selecting Day 2 (Nov 22) shows Ongoing period + Period ended, with no Period started button
     await user.click(screen.getByTestId('cal-day-2026-11-22'));
-    expect(screen.getByRole('button', { name: 'Period started' })).toBeDisabled();
-    expect(screen.getByRole('button', { name: 'Period ended' })).toBeEnabled();
+    expect(screen.getByText('Ongoing period')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Period started' })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Period ended' })).toBeInTheDocument();
 
+    // Marking Period ended on Nov 23 switches to Marked as period end + Undo period end
     await user.click(screen.getByTestId('cal-day-2026-11-23'));
-    expect(screen.getByRole('button', { name: 'Period started' })).toBeDisabled();
-    expect(screen.getByRole('button', { name: 'Period ended' })).toBeEnabled();
+    await user.click(screen.getByRole('button', { name: 'Period ended' }));
+    expect(await screen.findByText('Marked as period end')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Undo period end' }));
+    await waitFor(async () => {
+      const nov23 = await repo.getLogByDate('2026-11-23');
+      expect(nov23?.periodEnded).toBe(false);
+    });
 
-    // Nov 21 start date can still be toggled
+    // Undoing start on Nov 21 clears the whole auto-filled episode cleanly
     await user.click(screen.getByTestId('cal-day-2026-11-21'));
-    expect(screen.getByRole('button', { name: 'Marked as period start' })).toBeEnabled();
+    await user.click(screen.getByRole('button', { name: 'Undo period start' }));
+    await waitFor(async () => {
+      const logs = await repo.getAllLogs();
+      expect(logs).toHaveLength(0);
+    });
+    expect(screen.getByRole('button', { name: 'Period started' })).toBeInTheDocument();
     await db.delete();
   });
 

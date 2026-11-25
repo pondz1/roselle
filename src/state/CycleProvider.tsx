@@ -52,6 +52,7 @@ interface CycleContextValue {
   markPeriodStart: (date: ISODate) => Promise<void>;
   markPeriodEnd: (date: ISODate) => Promise<void>;
   clearPeriodDay: (date: ISODate) => Promise<void>;
+  clearPeriodEpisode: (startDate: ISODate) => Promise<void>;
   bulkSetPeriodDays: (updates: PeriodDayUpdate[]) => Promise<void>;
   updateSettings: (patch: Partial<Omit<UserSettings, 'id' | 'updatedAt'>>) => Promise<void>;
   completeOnboarding: (payload: OnboardingPayload) => Promise<void>;
@@ -292,6 +293,19 @@ export function CycleProvider({ repository, todayOverride, children }: CycleProv
     [repo],
   );
 
+  const clearPeriodEpisode = useCallback(
+    async (startDate: ISODate) => {
+      const target = episodes.find((ep) => ep.startDate === startDate);
+      if (!target || target.loggedDays.length === 0) return;
+      await repo.bulkSetPeriodDays(
+        target.loggedDays.map((d) => ({ date: d, flow: 'none', periodEnded: false })),
+      );
+      const nextLogs = await repo.getAllLogs();
+      setLogs(nextLogs);
+    },
+    [episodes, repo],
+  );
+
   const updateSettings = useCallback(
     async (patch: Partial<Omit<UserSettings, 'id' | 'updatedAt'>>) => {
       const updated = await repo.updateSettings(patch);
@@ -357,6 +371,7 @@ export function CycleProvider({ repository, todayOverride, children }: CycleProv
       markPeriodStart,
       markPeriodEnd,
       clearPeriodDay,
+      clearPeriodEpisode,
       bulkSetPeriodDays,
       updateSettings,
       completeOnboarding,
@@ -381,6 +396,7 @@ export function CycleProvider({ repository, todayOverride, children }: CycleProv
       markPeriodStart,
       markPeriodEnd,
       clearPeriodDay,
+      clearPeriodEpisode,
       bulkSetPeriodDays,
       updateSettings,
       completeOnboarding,

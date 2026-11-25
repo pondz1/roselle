@@ -139,6 +139,12 @@ export interface TranslationDict {
       periodStartActive: string;
       periodEndButton: string;
       periodEndActive: string;
+      periodStartStatus: string;
+      periodOngoingStatus: string;
+      periodEndStatus: string;
+      undoAction: string;
+      undoStartAria: string;
+      undoEndAria: string;
       openDetails: string;
       editDetails: string;
       autoEndHint: (days: number) => string;
@@ -433,6 +439,12 @@ export const translations: Record<Locale, TranslationDict> = {
         periodStartActive: 'เริ่มประจำเดือนวันนี้แล้ว',
         periodEndButton: 'ประจำเดือนหมดวันนี้',
         periodEndActive: 'บันทึกว่าหมดวันนี้แล้ว',
+        periodStartStatus: 'บันทึกเป็นวันเริ่มรอบแล้ว',
+        periodOngoingStatus: 'อยู่ในช่วงประจำเดือน',
+        periodEndStatus: 'บันทึกว่าหมดวันนี้แล้ว',
+        undoAction: 'ยกเลิก',
+        undoStartAria: 'ยกเลิกวันเริ่มประจำเดือน',
+        undoEndAria: 'ยกเลิกวันหมดประจำเดือน',
         openDetails: 'บันทึกอาการและอารมณ์',
         editDetails: 'แก้ไขบันทึกของวันนี้',
         autoEndHint: (days) => `หากไม่ได้กดหยุด ระบบจะจบรอบอัตโนมัติใน ${days} วันตามค่าตั้งค่า`,
@@ -761,6 +773,12 @@ export const translations: Record<Locale, TranslationDict> = {
         periodStartActive: 'Marked as period start',
         periodEndButton: 'Period ended',
         periodEndActive: 'Marked as period end',
+        periodStartStatus: 'Marked as period start',
+        periodOngoingStatus: 'Ongoing period',
+        periodEndStatus: 'Marked as period end',
+        undoAction: 'Undo',
+        undoStartAria: 'Undo period start',
+        undoEndAria: 'Undo period end',
         openDetails: 'Log symptoms & mood',
         editDetails: 'Edit daily log',
         autoEndHint: (days) => `Auto-ends after ${days} days based on your cycle defaults if unmarked`,

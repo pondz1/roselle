@@ -1,7 +1,13 @@
 import { Check, Droplets, PenLine, SquareCheck } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { EmptyState } from '../../components/ui/EmptyState';
-import { formatFullDate, formatShortDate } from '../../domain/date-utils';
+import {
+  addDays,
+  compareDates,
+  diffDays,
+  formatFullDate,
+  formatShortDate,
+} from '../../domain/date-utils';
 import type { ISODate } from '../../domain/types';
 import { useI18n } from '../../i18n/I18nProvider';
 import { useCycle } from '../../state/CycleProvider';
@@ -17,11 +23,13 @@ interface TodayViewProps {
 export function TodayView({ onOpenLog }: TodayViewProps) {
   const {
     today,
+    settings,
     summary,
     logsByDate,
     toggleTodayPeriod,
     clearTodayPeriod,
     markPeriodEnd,
+    extendPeriodToDate,
   } = useCycle();
   const { locale, setLocale, t } = useI18n();
 
@@ -31,6 +39,33 @@ export function TodayView({ onOpenLog }: TodayViewProps) {
   const isTodayMarkedEnded = Boolean(
     todayLog && todayLog.flow !== 'none' && todayLog.periodEnded === true,
   );
+
+  const latest = summary.latestEpisode;
+  let showPeriodEndCheckIn = false;
+  let checkInEndDate: ISODate | null = null;
+  let checkInDaysCount = settings.defaultPeriodLength;
+
+  if (latest && !latest.isExplicitlyEnded && summary.status === 'follicular') {
+    const offset = diffDays(latest.startDate, today);
+    const autoEndDate = addDays(latest.startDate, settings.defaultPeriodLength - 1);
+    const lastExpectedDate =
+      compareDates(latest.endDate, autoEndDate) >= 0 ? latest.endDate : autoEndDate;
+    const yesterday = addDays(today, -1);
+    const resolvedEndDate =
+      compareDates(lastExpectedDate, yesterday) <= 0 ? lastExpectedDate : yesterday;
+    const daysSinceLast = diffDays(resolvedEndDate, today);
+
+    if (
+      offset >= settings.defaultPeriodLength &&
+      offset <= 10 &&
+      daysSinceLast >= 1 &&
+      daysSinceLast <= 3
+    ) {
+      showPeriodEndCheckIn = true;
+      checkInEndDate = resolvedEndDate;
+      checkInDaysCount = diffDays(latest.startDate, resolvedEndDate) + 1;
+    }
+  }
 
   return (
     <div className="flex flex-col pb-6">
@@ -87,6 +122,41 @@ export function TodayView({ onOpenLog }: TodayViewProps) {
         <section className="px-5 pt-2 pb-6 flex flex-col items-center">
           <CycleRing summary={summary} />
 
+          {showPeriodEndCheckIn && checkInEndDate ? (
+            <aside
+              aria-label={t.today.periodCheckInTitle}
+              className="mt-5 w-full rounded-[14px] bg-coral-rose-soft/65 border border-rose-hairline px-4 py-3.5 space-y-3"
+            >
+              <div>
+                <p className="text-[0.875rem] font-semibold text-ink-primary">
+                  {t.today.periodCheckInTitle}
+                </p>
+                <p className="mt-0.5 text-[0.8125rem] leading-relaxed text-ink-secondary tabular-nums">
+                  {t.today.periodCheckInBody(checkInDaysCount)}
+                </p>
+              </div>
+              <div className="grid grid-cols-2 gap-2.5">
+                <Button
+                  variant="secondary"
+                  fullWidth
+                  size="sm"
+                  onClick={() => void markPeriodEnd(checkInEndDate)}
+                >
+                  <Check className="w-4 h-4" strokeWidth={1.6} />
+                  <span>{t.today.periodCheckInYesEnded}</span>
+                </Button>
+                <Button
+                  fullWidth
+                  size="sm"
+                  onClick={() => void extendPeriodToDate(today)}
+                >
+                  <Droplets className="w-4 h-4" strokeWidth={1.6} />
+                  <span>{t.today.periodCheckInStillGoing}</span>
+                </Button>
+              </div>
+            </aside>
+          ) : null}
+
           <div className="mt-6 w-full flex flex-col gap-2">
             {isPeriodActiveToday ? (
               <>
@@ -120,12 +190,12 @@ export function TodayView({ onOpenLog }: TodayViewProps) {
                   </Button>
                 ) : null}
               </>
-            ) : (
+            ) : !showPeriodEndCheckIn ? (
               <Button fullWidth size="lg" onClick={() => void toggleTodayPeriod()}>
                 <Droplets className="w-4 h-4" strokeWidth={1.6} />
                 <span>{t.today.logPeriodToday}</span>
               </Button>
-            )}
+            ) : null}
           </div>
 
           <div className="mt-6 w-full grid grid-cols-2 divide-x divide-rose-hairline border-y border-rose-hairline py-4">

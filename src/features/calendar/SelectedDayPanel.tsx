@@ -1,6 +1,6 @@
 import { Check, Droplets, PenLine, SquareCheck } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
-import { compareDates, diffDays, formatFullDate } from '../../domain/date-utils';
+import { addDays, compareDates, diffDays, formatFullDate } from '../../domain/date-utils';
 import type { ISODate } from '../../domain/types';
 import { useI18n } from '../../i18n/I18nProvider';
 import { useCycle } from '../../state/CycleProvider';
@@ -19,6 +19,7 @@ export function SelectedDayPanel({ date, onOpenDetails }: SelectedDayPanelProps)
     calendarMap,
     markPeriodStart,
     markPeriodEnd,
+    extendPeriodToDate,
     clearPeriodEpisode,
     bulkSetPeriodDays,
   } = useCycle();
@@ -37,6 +38,24 @@ export function SelectedDayPanel({ date, onOpenDetails }: SelectedDayPanelProps)
 
   const isEpisodeStart = Boolean(matchingEpisode && matchingEpisode.startDate === date);
   const isMarkedEnded = Boolean(log && log.flow !== 'none' && log.periodEnded === true);
+
+  const autoEndDate = matchingEpisode
+    ? addDays(matchingEpisode.startDate, settings.defaultPeriodLength - 1)
+    : null;
+  const isLoggedPeriodDay = Boolean(log && log.flow !== 'none');
+  const isInsideAutoWindow = Boolean(
+    matchingEpisode &&
+      !matchingEpisode.isExplicitlyEnded &&
+      autoEndDate &&
+      compareDates(date, autoEndDate) <= 0,
+  );
+  const isPastExpectedEnd = Boolean(
+    matchingEpisode &&
+      !isEpisodeStart &&
+      !isMarkedEnded &&
+      !isLoggedPeriodDay &&
+      !isInsideAutoWindow,
+  );
 
   let phaseLabel: string | null = null;
   let phaseClass = 'bg-tinted-subtle text-ink-secondary';
@@ -121,6 +140,25 @@ export function SelectedDayPanel({ date, onOpenDetails }: SelectedDayPanelProps)
                 <Droplets className="w-4 h-4 shrink-0" strokeWidth={1.6} />
                 <span>{t.calendar.selectedDay.periodStartButton}</span>
               </button>
+            ) : isPastExpectedEnd ? (
+              <div className="grid grid-cols-2 gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => void extendPeriodToDate(date)}
+                  className="flex items-center justify-center gap-2 min-h-11 px-3 py-2 rounded-[10px] text-[0.8125rem] font-medium bg-coral-rose-soft/80 text-coral-rose-ink hover:bg-coral-rose-soft transition-[background-color,transform] duration-[150ms] active:scale-[0.98]"
+                >
+                  <Droplets className="w-4 h-4 shrink-0" strokeWidth={1.6} />
+                  <span className="truncate">{t.calendar.selectedDay.periodStillGoingButton}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void markPeriodEnd(date)}
+                  className="flex items-center justify-center gap-2 min-h-11 px-3 py-2 rounded-[10px] text-[0.8125rem] font-medium bg-tinted-subtle text-ink-primary hover:bg-tinted-subtle/70 transition-[background-color,transform] duration-[150ms] active:scale-[0.98]"
+                >
+                  <SquareCheck className="w-4 h-4 shrink-0" strokeWidth={1.6} />
+                  <span className="truncate">{t.calendar.selectedDay.periodEndButton}</span>
+                </button>
+              </div>
             ) : (
               <>
                 {isEpisodeStart ? (
